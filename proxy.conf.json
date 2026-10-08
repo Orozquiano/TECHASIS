@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "target": "http://backend-pendiente.invalid",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

@@ -1,0 +1,56 @@
+<main class="login" lang="es">
+  <section class="login_intro" aria-label="Techasis">
+    <div class="login_intro-content">
+      <p class="login_brand">
+        <span class="login_mark" aria-hidden="true">
+          <img src="assets/icons/icon_app.svg" alt="" />
+        </span>
+        Techasis
+      </p>
+      <h1 class="login_title">Gestión de servicios de grúas</h1>
+      <p class="login_lead">Ingresa al espacio de tu empresa en la plataforma.</p>
+    </div>
+  </section>
+
+  <section class="login_panel">
+    <form class="login_form" (submit)="onSubmit($event)">
+      <header class="login_form-header">
+        <h2>Iniciar sesión</h2>
+        <p>Usa el correo y la contraseña de tu cuenta.</p>
+      </header>
+
+      <div class="field">
+        <label class="field_label" for="login-email">Correo electrónico</label>
+        <input id="login-email" class="field_input" type="email" name="email" autocomplete="username"
+          placeholder="correo@empresa.com" required />
+      </div>
+
+      <div class="field">
+        <label class="field_label" for="login-password">Contraseña</label>
+        <div class="field_control">
+          <input id="login-password" class="field_input" [type]="passwordVisible() ? 'text' : 'password'"
+            name="password" autocomplete="current-password" placeholder="Contraseña" required />
+          <button class="field_toggle" type="button" (click)="togglePasswordVisibility()"
+            [attr.aria-pressed]="passwordVisible()"
+            [attr.aria-label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            @if (passwordVisible()) {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M3 3l18 18M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4M9.9 5.2A10.8 10.8 0 0 1 12 5c5.5 0 9.5 4.2 11 7-0.6 1.1-1.5 2.3-2.6 3.4M6.1 6.7C4.2 8 2.8 9.8 2 12c1.5 2.8 5.5 7 10 7 1.2 0 2.3-.2 3.3-.6"
+                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            } @else {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 12c1.5-2.8 5.5-7 10-7s8.5 4.2 10 7c-1.5 2.8-5.5 7-10 7s-8.5-4.2-10-7z" fill="none"
+                stroke="currentColor" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            }
+          </button>
+        </div>
+      </div>
+
+      <button class="login_submit" type="submit">Ingresar</button>
+    </form>
+  </section>
+</main>

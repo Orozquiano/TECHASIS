@@ -207,6 +207,17 @@
   }
 }
 
+.login_demo {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  color: var(--login-ink);
+  background: color-mix(in srgb, var(--login-accent) 14%, white);
+  border: 1px solid color-mix(in srgb, var(--login-accent) 35%, white);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .login_error {
   margin-bottom: 18px;
   padding: 12px 14px;

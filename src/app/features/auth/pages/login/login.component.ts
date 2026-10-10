@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { APP_ENVIRONMENT } from '../../../../core/config/app-environment';
+import { DEMO_CREDENTIALS } from '../../../../core/http/mock-api.store';
 import type { ApiResponse } from '../../../../core/models';
 
 /**
@@ -18,6 +20,17 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly env = inject(APP_ENVIRONMENT);
+
+  /**
+   * @description Indica si la app corre con API simulada.
+   */
+  protected readonly isDemoMode = this.env.useMockApi;
+
+  /**
+   * @description Credenciales visibles solo en el despliegue demo.
+   */
+  protected readonly demoCredentials = DEMO_CREDENTIALS;
 
   /**
    * @description Indica si la contraseña se muestra en texto visible.
@@ -38,8 +51,8 @@ export class LoginComponent {
    * @description Formulario reactivo de inicio de sesión.
    */
   protected readonly loginForm = this.fb.nonNullable.group({
-    user: ['', Validators.required],
-    password: ['', Validators.required],
+    user: [this.env.useMockApi ? DEMO_CREDENTIALS.user : '', Validators.required],
+    password: [this.env.useMockApi ? DEMO_CREDENTIALS.password : '', Validators.required],
     remember: [false],
   });
 

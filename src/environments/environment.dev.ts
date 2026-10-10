@@ -7,4 +7,5 @@ export const environment: AppEnvironment = {
   production: false,
   environmentName: 'dev',
   apiUrl: '/api',
+  useMockApi: false,
 };

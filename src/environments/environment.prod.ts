@@ -7,4 +7,5 @@ export const environment: AppEnvironment = {
   production: true,
   environmentName: 'production',
   apiUrl: 'http://179.0.9.180:8080/api',
+  useMockApi: false,
 };

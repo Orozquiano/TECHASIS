@@ -16,8 +16,21 @@
     <form class="login_form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <header class="login_form-header">
         <h2>Iniciar sesión</h2>
-        <p>Usa el usuario y la contraseña de tu cuenta.</p>
+        <p>
+          @if (isDemoMode) {
+            Modo demo: datos simulados, sin backend.
+          } @else {
+            Usa el usuario y la contraseña de tu cuenta.
+          }
+        </p>
       </header>
+
+      @if (isDemoMode) {
+        <div class="login_demo" role="note">
+          Usuario <strong>{{ demoCredentials.user }}</strong>
+          · Contraseña <strong>{{ demoCredentials.password }}</strong>
+        </div>
+      }
 
       @if (errorMessage()) {
         <div class="login_error" role="alert">{{ errorMessage() }}</div>

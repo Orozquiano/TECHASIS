@@ -82,7 +82,18 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "with": "src/environments/environment.demo.ts"
+                }
+              ]
+            },
+            "demo": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.demo.ts"
                 }
               ]
             },
@@ -148,6 +159,9 @@
             "preprod": {
               "buildTarget": "techasis:build:preprod",
               "proxyConfig": "proxy.conf.json"
+            },
+            "demo": {
+              "buildTarget": "techasis:build:demo"
             }
           },
           "defaultConfiguration": "development"

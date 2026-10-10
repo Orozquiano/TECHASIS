@@ -1,0 +1,38 @@
+
+.shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand-secondary) 16%, transparent), transparent 42%),
+    radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--brand-primary) 10%, transparent), transparent 38%),
+    var(--canvas);
+}
+
+.shell_main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+  animation: main-in 0.45s ease 0.08s both;
+}
+
+@keyframes main-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell_main {
+    padding: 0 12px 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell_main {
+    animation: none;
+  }
+}

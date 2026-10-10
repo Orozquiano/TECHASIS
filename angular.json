@@ -116,13 +116,16 @@
               "proxyConfig": "proxy.conf.json"
             },
             "dev": {
-              "buildTarget": "techasis:build:dev"
+              "buildTarget": "techasis:build:dev",
+              "proxyConfig": "proxy.conf.json"
             },
             "test": {
-              "buildTarget": "techasis:build:test"
+              "buildTarget": "techasis:build:test",
+              "proxyConfig": "proxy.conf.json"
             },
             "preprod": {
-              "buildTarget": "techasis:build:preprod"
+              "buildTarget": "techasis:build:preprod",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

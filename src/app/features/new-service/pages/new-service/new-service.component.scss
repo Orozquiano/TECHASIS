@@ -1,0 +1,116 @@
+.ns {
+  display: grid;
+  gap: 16px;
+}
+
+.ns_hero {
+  padding: 8px 4px 4px;
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    max-width: 40rem;
+  }
+}
+
+.ns_eyebrow {
+  margin: 0 0 8px !important;
+  color: var(--brand-secondary) !important;
+  font-size: 0.8rem !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ns_info {
+  padding: 12px 14px;
+  color: var(--brand-primary);
+  background: color-mix(in srgb, var(--brand-secondary) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--brand-secondary) 30%, white);
+  border-radius: 12px;
+}
+
+.ns_grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 16px;
+  align-items: start;
+}
+
+.ns_main {
+  display: grid;
+  gap: 14px;
+}
+
+.ns_aside {
+  position: sticky;
+  top: 16px;
+}
+
+.ns_aside-copy {
+  margin: 0 0 16px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.ns_pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ns_pill {
+  min-height: 40px;
+  padding: 0 14px;
+  color: var(--muted);
+  font-weight: 600;
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: var(--text);
+    border-color: color-mix(in srgb, var(--brand-secondary) 45%, var(--line));
+  }
+
+  &.is-active {
+    color: var(--surface);
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+  }
+}
+
+.ns_otro {
+  margin-top: 8px;
+}
+
+.ns_full {
+  grid-column: 1 / -1;
+}
+
+.ns_full-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+@media (max-width: 960px) {
+  .ns_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ns_aside {
+    position: static;
+  }
+}

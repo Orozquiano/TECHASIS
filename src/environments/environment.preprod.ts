@@ -6,5 +6,5 @@ import type { AppEnvironment } from './environment.model';
 export const environment: AppEnvironment = {
   production: false,
   environmentName: 'preprod',
-  apiUrl: '',
+  apiUrl: 'http://179.0.9.180:8080/api',
 };

@@ -1,0 +1,13 @@
+<section class="card">
+  @if (title()) {
+    <header class="card_title">
+      <h2>{{ title() }}</h2>
+      @if (required()) {
+        <span class="card_req" aria-hidden="true">*</span>
+      }
+    </header>
+  }
+  <div class="card_body">
+    <ng-content />
+  </div>
+</section>

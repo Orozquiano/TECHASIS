@@ -1,0 +1,144 @@
+.admin {
+  display: grid;
+  gap: 16px;
+}
+
+.admin_hero {
+  padding: 8px 4px 10px;
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    max-width: 42rem;
+  }
+}
+
+.admin_eyebrow {
+  margin: 0 0 8px !important;
+  color: var(--brand-secondary) !important;
+  font-size: 0.8rem !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin_section {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.admin_section-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 240px) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin_toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+}
+
+.admin_chevron {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+
+  &.is-open {
+    transform: rotate(45deg);
+  }
+}
+
+.admin_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.admin_item {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.admin_item-info {
+  display: grid;
+  gap: 4px;
+
+  strong {
+    font-size: 0.98rem;
+  }
+
+  small {
+    color: var(--muted);
+  }
+}
+
+.admin_item-actions {
+  display: flex;
+  gap: 8px;
+
+  button {
+    flex: 1;
+    min-height: 36px;
+    color: var(--text);
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--brand-secondary);
+      color: var(--brand-secondary);
+    }
+
+    &.is-danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+  }
+}
+
+.admin_empty {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 800px) {
+  .admin_section-header {
+    grid-template-columns: 1fr;
+  }
+}

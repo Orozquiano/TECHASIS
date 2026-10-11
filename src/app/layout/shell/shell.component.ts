@@ -12,9 +12,14 @@ import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 
 /**
- * @description Duración del desplazamiento entre secciones, en milisegundos.
+ * @description Duración de la salida del contenido, en milisegundos.
  */
-const PAGE_MOTION_MS = 480;
+const PAGE_EXIT_MS = 220;
+
+/**
+ * @description Duración de la entrada del contenido nuevo, en milisegundos.
+ */
+const PAGE_ENTER_MS = 320;
 
 /**
  * @description Curva compartida con la cápsula de selección.
@@ -29,7 +34,7 @@ type PageMotionDirection = 'forward' | 'back';
 /**
  * @class ShellComponent
  * @description Contenedor autenticado con cabecera, navegación y contenido.
- * Al cambiar de sección, la página actual y la siguiente se deslizan en el mismo sentido.
+ * Al cambiar de sección, el contenido actual desaparece y el nuevo vuelve a aparecer.
  */
 @Component({
   selector: 'app-shell',
@@ -144,7 +149,7 @@ export class ShellComponent {
 
   /**
    * @function playPageMotion
-   * @description Desliza la página nueva y la copia de la anterior en el mismo sentido.
+   * @description Lanza la secuencia de desaparición y reaparición del contenido.
    * @param navigationId Identificador de la navegación que terminó.
    */
   private playPageMotion(navigationId: number): void {
@@ -175,7 +180,7 @@ export class ShellComponent {
 
   /**
    * @function animatePageChange
-   * @description Ejecuta el desplazamiento de las dos páginas y lo retira al terminar.
+   * @description Hace desaparecer la página anterior y, al terminar, hace aparecer la nueva.
    * @param stage Contenedor de la página activa.
    * @param entering Página que acaba de montarse.
    * @param navigationId Identificador de la navegación asociada.
@@ -186,28 +191,45 @@ export class ShellComponent {
       return;
     }
 
-    const forward = this.motionDirection === 'forward';
     stage.dataset['nav'] = this.motionDirection;
     const easing = PAGE_MOTION_EASING;
-    const duration = PAGE_MOTION_MS;
 
-    const exitX = forward ? '-100%' : '100%';
-    const enterX = forward ? '100%' : '-100%';
+    entering.style.opacity = '0';
+    entering.style.transform = 'translate3d(0, 12px, 0) scale(0.985)';
 
     this.leavingAnimation = leaving.animate(
-      [{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(${exitX}, 0, 0)` }],
-      { duration, easing, fill: 'forwards' },
-    );
-    this.enteringAnimation = entering.animate(
-      [{ transform: `translate3d(${enterX}, 0, 0)` }, { transform: 'translate3d(0, 0, 0)' }],
-      { duration, easing, fill: 'backwards' },
+      [
+        { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+        { opacity: 0, transform: 'translate3d(0, -10px, 0) scale(0.985)' },
+      ],
+      { duration: PAGE_EXIT_MS, easing, fill: 'forwards' },
     );
 
-    this.enteringAnimation.finished.then(
+    this.leavingAnimation.finished.then(
       () => {
-        if (this.motionId === navigationId) {
-          this.finishPageMotion();
+        if (this.motionId !== navigationId) {
+          return;
         }
+
+        leaving.style.visibility = 'hidden';
+        this.enteringAnimation = entering.animate(
+          [
+            { opacity: 0, transform: 'translate3d(0, 14px, 0) scale(0.985)' },
+            { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
+          ],
+          { duration: PAGE_ENTER_MS, easing, fill: 'forwards' },
+        );
+
+        this.enteringAnimation.finished.then(
+          () => {
+            if (this.motionId === navigationId) {
+              entering.style.opacity = '';
+              entering.style.transform = '';
+              this.finishPageMotion();
+            }
+          },
+          () => undefined,
+        );
       },
       () => undefined,
     );
@@ -229,6 +251,11 @@ export class ShellComponent {
     const stage = this.stage()?.nativeElement;
     if (stage) {
       delete stage.dataset['nav'];
+      const page = this.pageElement(stage);
+      if (page) {
+        page.style.opacity = '';
+        page.style.transform = '';
+      }
     }
   }
 

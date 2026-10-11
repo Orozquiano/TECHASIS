@@ -38,9 +38,13 @@
   opacity: 0;
 }
 
+.navbar_pill.is-ready,
+.tabbar_pill.is-ready {
+  opacity: 1;
+}
+
 .navbar_pill.is-animate,
 .tabbar_pill.is-animate {
-  opacity: 1;
   transition:
     transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
     width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
@@ -69,7 +73,7 @@
   }
 
   &.is-active {
-    color: var(--surface);
+    color: var(--brand-primary);
     font-weight: 600;
     background: transparent;
   }
@@ -78,6 +82,10 @@
     outline: 2px solid var(--brand-secondary);
     outline-offset: 2px;
   }
+}
+
+.navbar_items:has(.navbar_pill.is-ready) .navbar_link.is-active {
+  color: var(--surface);
 }
 
 .tabbar,
@@ -179,7 +187,8 @@
     cursor: pointer;
 
     &.is-active {
-      color: var(--surface);
+      color: var(--brand-primary);
+      font-weight: 600;
       background: transparent;
     }
 
@@ -187,6 +196,10 @@
       outline: 2px solid var(--brand-secondary);
       outline-offset: 2px;
     }
+  }
+
+  .tabbar:has(.tabbar_pill.is-ready) .tabbar_item.is-active {
+    color: var(--surface);
   }
 
   .tabbar_label {

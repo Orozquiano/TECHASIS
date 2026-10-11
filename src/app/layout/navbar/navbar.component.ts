@@ -166,6 +166,7 @@ export class NavbarComponent implements OnInit {
       .subscribe((event) => {
         this.currentUrl.set(event.urlAfterRedirects);
         this.moreOpen.set(false);
+        this.schedulePillSync();
       });
 
     effect(() => {
@@ -179,8 +180,7 @@ export class NavbarComponent implements OnInit {
       this.visibleNavItems();
       this.moreActive();
       this.pageOverlayOpen();
-      this.movePill(this.navTrack()?.nativeElement, this.navPill()?.nativeElement, '.navbar_link.is-active');
-      this.movePill(this.tabTrack()?.nativeElement, this.tabPill()?.nativeElement, '.tabbar_item.is-active');
+      this.syncPills();
     });
   }
 
@@ -190,6 +190,7 @@ export class NavbarComponent implements OnInit {
    */
   ngOnInit(): void {
     this.filterMenuByPermissions();
+    this.schedulePillSync();
   }
 
   /**
@@ -296,8 +297,39 @@ export class NavbarComponent implements OnInit {
    */
   @HostListener('window:resize')
   protected onResize(): void {
-    this.movePill(this.navTrack()?.nativeElement, this.navPill()?.nativeElement, '.navbar_link.is-active');
-    this.movePill(this.tabTrack()?.nativeElement, this.tabPill()?.nativeElement, '.tabbar_item.is-active');
+    this.syncPills();
+  }
+
+  /**
+   * @function schedulePillSync
+   * @description Reintenta ubicar la cápsula cuando el layout o la ruta activa aún no están listos.
+   */
+  private schedulePillSync(): void {
+    requestAnimationFrame(() => {
+      this.syncPills(8);
+    });
+  }
+
+  /**
+   * @function syncPills
+   * @description Actualiza la cápsula de escritorio y la de la barra inferior.
+   * @param retries Intentos restantes si el ítem activo todavía no está medible.
+   */
+  private syncPills(retries = 0): void {
+    const navReady = this.movePill(
+      this.navTrack()?.nativeElement,
+      this.navPill()?.nativeElement,
+      '.navbar_link.is-active',
+    );
+    const tabReady = this.movePill(
+      this.tabTrack()?.nativeElement,
+      this.tabPill()?.nativeElement,
+      '.tabbar_item.is-active',
+    );
+
+    if ((!navReady || !tabReady) && retries > 0) {
+      requestAnimationFrame(() => this.syncPills(retries - 1));
+    }
   }
 
   /**
@@ -306,15 +338,25 @@ export class NavbarComponent implements OnInit {
    * @param track Contenedor de las opciones.
    * @param pill Cápsula que marca la selección.
    * @param activeSelector Selector de la opción activa dentro del contenedor.
+   * @returns true cuando la cápsula quedó posicionada o el contenedor no aplica.
    */
-  private movePill(track: HTMLElement | undefined, pill: HTMLElement | undefined, activeSelector: string): void {
-    if (!track || !pill || track.offsetWidth === 0) {
-      return;
+  private movePill(
+    track: HTMLElement | undefined,
+    pill: HTMLElement | undefined,
+    activeSelector: string,
+  ): boolean {
+    if (!track || !pill) {
+      return true;
+    }
+
+    const trackVisible = track.offsetWidth > 0 && getComputedStyle(track).display !== 'none';
+    if (!trackVisible) {
+      return true;
     }
 
     const active = track.querySelector<HTMLElement>(activeSelector);
-    if (!active) {
-      return;
+    if (!active || active.offsetWidth === 0) {
+      return false;
     }
 
     const firstMove = pill.dataset['ready'] !== 'true';
@@ -322,11 +364,14 @@ export class NavbarComponent implements OnInit {
     pill.style.width = `${active.offsetWidth}px`;
     pill.style.height = `${active.offsetHeight}px`;
     pill.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
+    pill.classList.add('is-ready');
 
     if (firstMove) {
       pill.dataset['ready'] = 'true';
       requestAnimationFrame(() => pill.classList.add('is-animate'));
     }
+
+    return true;
   }
 
   /**

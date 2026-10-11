@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://backend-pendiente.invalid",
+    "target": "http://179.0.9.180:8080",
     "secure": false,
     "changeOrigin": true
   }

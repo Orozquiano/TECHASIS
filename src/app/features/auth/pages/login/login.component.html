@@ -13,44 +13,95 @@
   </section>
 
   <section class="login_panel">
-    <form class="login_form" (submit)="onSubmit($event)">
+    <form class="login_form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <header class="login_form-header">
         <h2>Iniciar sesión</h2>
-        <p>Usa el correo y la contraseña de tu cuenta.</p>
+        <p>
+          @if (isDemoMode) {
+            Modo demo: datos simulados, sin backend.
+          } @else {
+            Usa el usuario y la contraseña de tu cuenta.
+          }
+        </p>
       </header>
 
+      @if (isDemoMode) {
+        <div class="login_demo" role="note">
+          Usuario <strong>{{ demoCredentials.user }}</strong>
+          · Contraseña <strong>{{ demoCredentials.password }}</strong>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="login_error" role="alert">{{ errorMessage() }}</div>
+      }
+
       <div class="field">
-        <label class="field_label" for="login-email">Correo electrónico</label>
-        <input id="login-email" class="field_input" type="email" name="email" autocomplete="username"
-          placeholder="correo@empresa.com" required />
+        <label class="field_label" for="login-user">Usuario</label>
+        <input
+          id="login-user"
+          class="field_input"
+          type="text"
+          formControlName="user"
+          autocomplete="username"
+          placeholder="Usuario o documento"
+          required
+        />
       </div>
 
       <div class="field">
         <label class="field_label" for="login-password">Contraseña</label>
         <div class="field_control">
-          <input id="login-password" class="field_input" [type]="passwordVisible() ? 'text' : 'password'"
-            name="password" autocomplete="current-password" placeholder="Contraseña" required />
-          <button class="field_toggle" type="button" (click)="togglePasswordVisibility()"
+          <input
+            id="login-password"
+            class="field_input"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="Contraseña"
+            required
+          />
+          <button
+            class="field_toggle"
+            type="button"
+            (click)="togglePasswordVisibility()"
             [attr.aria-pressed]="passwordVisible()"
-            [attr.aria-label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            [attr.aria-label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
             @if (passwordVisible()) {
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M3 3l18 18M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4M9.9 5.2A10.8 10.8 0 0 1 12 5c5.5 0 9.5 4.2 11 7-0.6 1.1-1.5 2.3-2.6 3.4M6.1 6.7C4.2 8 2.8 9.8 2 12c1.5 2.8 5.5 7 10 7 1.2 0 2.3-.2 3.3-.6"
-                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M3 3l18 18M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4M9.9 5.2A10.8 10.8 0 0 1 12 5c5.5 0 9.5 4.2 11 7-0.6 1.1-1.5 2.3-2.6 3.4M6.1 6.7C4.2 8 2.8 9.8 2 12c1.5 2.8 5.5 7 10 7 1.2 0 2.3-.2 3.3-.6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             } @else {
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2 12c1.5-2.8 5.5-7 10-7s8.5 4.2 10 7c-1.5 2.8-5.5 7-10 7s-8.5-4.2-10-7z" fill="none"
-                stroke="currentColor" stroke-width="1.8" />
-              <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
-            </svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2 12c1.5-2.8 5.5-7 10-7s8.5 4.2 10 7c-1.5 2.8-5.5 7-10 7s-8.5-4.2-10-7z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+              </svg>
             }
           </button>
         </div>
       </div>
 
-      <button class="login_submit" type="submit">Ingresar</button>
+      <label class="login_remember">
+        <input type="checkbox" formControlName="remember" />
+        <span>Recordarme en este equipo</span>
+      </label>
+
+      <button class="login_submit" type="submit" [disabled]="isLoading()">
+        {{ isLoading() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
     </form>
   </section>
 </main>

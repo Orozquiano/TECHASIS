@@ -1,7 +1,13 @@
 /**
  * @description Ambientes de ejecución previstos para el frontend.
  */
-export type EnvironmentName = 'development' | 'dev' | 'test' | 'preprod' | 'production';
+export type EnvironmentName =
+  | 'development'
+  | 'dev'
+  | 'test'
+  | 'preprod'
+  | 'production'
+  | 'demo';
 
 /**
  * @interface AppEnvironment
@@ -23,4 +29,9 @@ export interface AppEnvironment {
    * @description URL base de la API del backend. Vacía mientras esa URL no esté definida.
    */
   apiUrl: string;
+
+  /**
+   * @description Cuando es true, el frontend usa datos simulados sin llamar al backend.
+   */
+  useMockApi: boolean;
 }

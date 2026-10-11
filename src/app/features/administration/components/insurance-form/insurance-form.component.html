@@ -1,0 +1,43 @@
+<form [formGroup]="insuranceForm" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-group">
+    <label for="insurance-nombre">Nombre *</label>
+    <input
+      id="insurance-nombre"
+      type="text"
+      formControlName="nombre"
+      placeholder="Ej: Bolívar"
+      [class.is-invalid]="insuranceForm.controls.nombre.invalid && insuranceForm.controls.nombre.touched"
+    />
+    @if (insuranceForm.controls.nombre.invalid && insuranceForm.controls.nombre.touched) {
+      <span class="error-text">El nombre es obligatorio.</span>
+    }
+  </div>
+
+  <div class="form-group">
+    <label for="insurance-codigo">Código *</label>
+    <input
+      id="insurance-codigo"
+      type="text"
+      formControlName="codigo"
+      placeholder="Ej: BOL"
+      [class.is-invalid]="insuranceForm.controls.codigo.invalid && insuranceForm.controls.codigo.touched"
+    />
+    @if (insuranceForm.controls.codigo.invalid && insuranceForm.controls.codigo.touched) {
+      <span class="error-text">El código es obligatorio.</span>
+    }
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label class="checkbox-label">
+      <input type="checkbox" formControlName="activo" />
+      <span>Estado activo</span>
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
+    <button type="submit" class="btn-primary">
+      {{ insurance ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</form>

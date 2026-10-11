@@ -6,5 +6,6 @@ import type { AppEnvironment } from './environment.model';
 export const environment: AppEnvironment = {
   production: true,
   environmentName: 'production',
-  apiUrl: '',
+  apiUrl: 'http://179.0.9.180:8080/api',
+  useMockApi: false,
 };

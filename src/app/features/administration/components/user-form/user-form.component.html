@@ -1,0 +1,60 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-group">
+    <label for="user-tipo-doc">Tipo de documento *</label>
+    <select id="user-tipo-doc" formControlName="tipoDocumentoId">
+      <option value="">Seleccione...</option>
+      @for (tipo of tiposDocumento; track tipo.id) {
+        <option [value]="tipo.id">{{ tipo.nombre }} ({{ tipo.codigo }})</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="user-documento">Documento *</label>
+    <input id="user-documento" type="text" formControlName="documento" placeholder="Número de documento" />
+  </div>
+
+  <div class="form-group">
+    <label for="user-rol">Rol *</label>
+    <select id="user-rol" formControlName="rolId">
+      <option value="">Seleccione...</option>
+      @for (rol of roles; track rol.id) {
+        <option [value]="rol.id">{{ rol.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="user-pnombre">Primer nombre *</label>
+      <input id="user-pnombre" type="text" formControlName="primerNombre" />
+    </div>
+    <div class="form-group">
+      <label for="user-snombre">Segundo nombre</label>
+      <input id="user-snombre" type="text" formControlName="segundoNombre" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="user-papellido">Primer apellido *</label>
+      <input id="user-papellido" type="text" formControlName="primerApellido" />
+    </div>
+    <div class="form-group">
+      <label for="user-sapellido">Segundo apellido</label>
+      <input id="user-sapellido" type="text" formControlName="segundoApellido" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="user-clave">Contraseña {{ user ? '(opcional al editar)' : '*' }}</label>
+    <input id="user-clave" type="password" formControlName="clave" placeholder="••••••••" autocomplete="new-password" />
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
+    <button type="submit" class="btn-primary">
+      {{ user ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</form>

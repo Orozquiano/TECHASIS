@@ -1,0 +1,45 @@
+<form [formGroup]="statusForm" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-group">
+    <label for="status-codigo">Código *</label>
+    <input
+      id="status-codigo"
+      type="text"
+      formControlName="codigo"
+      placeholder="Ej: 001"
+      [class.is-invalid]="statusForm.controls.codigo.invalid && statusForm.controls.codigo.touched"
+    />
+    @if (statusForm.controls.codigo.invalid && statusForm.controls.codigo.touched) {
+      <span class="error-text">El código es obligatorio.</span>
+    }
+  </div>
+
+  <div class="form-group">
+    <label for="status-descripcion">Descripción *</label>
+    <input
+      id="status-descripcion"
+      type="text"
+      formControlName="descripcion"
+      placeholder="Ej: En proceso"
+      [class.is-invalid]="
+        statusForm.controls.descripcion.invalid && statusForm.controls.descripcion.touched
+      "
+    />
+    @if (statusForm.controls.descripcion.invalid && statusForm.controls.descripcion.touched) {
+      <span class="error-text">La descripción es obligatoria.</span>
+    }
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label class="checkbox-label">
+      <input type="checkbox" formControlName="activo" />
+      <span>Estado activo</span>
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
+    <button type="submit" class="btn-primary">
+      {{ status ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</form>

@@ -1,0 +1,220 @@
+<section class="admin">
+  <header class="admin_hero">
+    <p class="admin_eyebrow">Catálogos operativos</p>
+    <h1>Administración</h1>
+    <p>Gestiona usuarios, flota, aseguradoras y estados del servicio.</p>
+  </header>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('users')">
+        <span class="admin_chevron" [class.is-open]="isUsersOpen()" aria-hidden="true"></span>
+        <h2>Usuarios</h2>
+      </button>
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Buscar usuarios..."
+        [formControl]="userSearchCtrl"
+      />
+      <button class="btn-primary" type="button" (click)="openUserModal()">Crear</button>
+    </header>
+
+    @if (isUsersOpen()) {
+      <div class="admin_grid">
+        @for (user of filteredUsers(); track user.id) {
+          <article class="admin_item">
+            <div class="admin_item-info">
+              <strong>{{ user.primerNombre }} {{ user.primerApellido }}</strong>
+              <small>Doc: {{ user.documento }}</small>
+            </div>
+            <div class="admin_item-actions">
+              <button type="button" (click)="openUserModal(user.id)">Editar</button>
+              <button type="button" class="is-danger" (click)="deleteUser(user.id)">Eliminar</button>
+            </div>
+          </article>
+        } @empty {
+          <p class="admin_empty">No hay usuarios registrados.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('vehicles')">
+        <span class="admin_chevron" [class.is-open]="isVehiclesOpen()" aria-hidden="true"></span>
+        <h2>Vehículos</h2>
+      </button>
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Buscar vehículos..."
+        [formControl]="vehicleSearchCtrl"
+      />
+      <button class="btn-primary" type="button" (click)="openVehicleModal()">Crear</button>
+    </header>
+
+    @if (isVehiclesOpen()) {
+      <div class="admin_grid">
+        @for (vehicle of filteredVehicles(); track vehicle.id) {
+          <article class="admin_item">
+            <div class="admin_item-info">
+              <strong>{{ vehicle.placa }}</strong>
+              <small>{{ vehicle.tipoVehiculo.nombre }} · Cod: {{ vehicle.codigo }}</small>
+            </div>
+            <div class="admin_item-actions">
+              <button type="button" (click)="openVehicleModal(vehicle.id)">Editar</button>
+              <button type="button" class="is-danger" (click)="deleteVehicle(vehicle.id)">
+                Eliminar
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <p class="admin_empty">No hay vehículos registrados.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('insurances')">
+        <span class="admin_chevron" [class.is-open]="isInsurancesOpen()" aria-hidden="true"></span>
+        <h2>Aseguradoras</h2>
+      </button>
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Buscar aseguradoras..."
+        [formControl]="insuranceSearchCtrl"
+      />
+      <button class="btn-primary" type="button" (click)="openInsuranceModal()">Crear</button>
+    </header>
+
+    @if (isInsurancesOpen()) {
+      <div class="admin_grid">
+        @for (insurance of filteredInsurances(); track insurance.id) {
+          <article class="admin_item">
+            <div class="admin_item-info">
+              <strong>{{ insurance.nombre }}</strong>
+              <small>Cod: {{ insurance.codigo }}</small>
+            </div>
+            <div class="admin_item-actions">
+              <button type="button" (click)="openInsuranceModal(insurance.id)">Editar</button>
+              <button type="button" class="is-danger" (click)="deleteInsurance(insurance.id)">
+                Eliminar
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <p class="admin_empty">No hay aseguradoras registradas.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('statuses')">
+        <span class="admin_chevron" [class.is-open]="isStatusesOpen()" aria-hidden="true"></span>
+        <h2>Estados de servicio</h2>
+      </button>
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Buscar estados..."
+        [formControl]="statusSearchCtrl"
+      />
+      <button class="btn-primary" type="button" (click)="openStatusModal()">Crear</button>
+    </header>
+
+    @if (isStatusesOpen()) {
+      <div class="admin_grid">
+        @for (status of filteredStatuses(); track status.id) {
+          <article class="admin_item">
+            <div class="admin_item-info">
+              <strong>{{ status.descripcion }}</strong>
+              <small>Cod: {{ status.codigo }}</small>
+            </div>
+            <div class="admin_item-actions">
+              <button type="button" (click)="openStatusModal(status.id)">Editar</button>
+              <button type="button" class="is-danger" (click)="deleteStatus(status.id)">
+                Eliminar
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <p class="admin_empty">No hay estados registrados.</p>
+        }
+      </div>
+    }
+  </section>
+</section>
+
+<app-modal
+  [isOpen]="isUserModalOpen()"
+  [title]="selectedUser() ? 'Editar usuario' : 'Crear usuario'"
+  (closed)="closeUserModal()"
+>
+  @if (isModalLoading()) {
+    <p class="admin_empty">Cargando...</p>
+  } @else {
+    <app-user-form
+      [user]="selectedUser()"
+      [tiposDocumento]="userParams().tiposDocumento"
+      [roles]="userParams().roles"
+      (save)="saveUser($event)"
+      (cancel)="closeUserModal()"
+    />
+  }
+</app-modal>
+
+<app-modal
+  [isOpen]="isVehicleModalOpen()"
+  [title]="selectedVehicle() ? 'Editar vehículo' : 'Crear vehículo'"
+  (closed)="closeVehicleModal()"
+>
+  @if (isModalLoading()) {
+    <p class="admin_empty">Cargando...</p>
+  } @else {
+    <app-vehicle-form
+      [vehicle]="selectedVehicle()"
+      [tiposVehiculo]="vehicleParams().tiposVehiculo"
+      (save)="saveVehicle($event)"
+      (cancel)="closeVehicleModal()"
+    />
+  }
+</app-modal>
+
+<app-modal
+  [isOpen]="isInsuranceModalOpen()"
+  [title]="selectedInsurance() ? 'Editar aseguradora' : 'Crear aseguradora'"
+  (closed)="closeInsuranceModal()"
+>
+  @if (isModalLoading()) {
+    <p class="admin_empty">Cargando...</p>
+  } @else {
+    <app-insurance-form
+      [insurance]="selectedInsurance()"
+      (save)="saveInsurance($event)"
+      (cancel)="closeInsuranceModal()"
+    />
+  }
+</app-modal>
+
+<app-modal
+  [isOpen]="isStatusModalOpen()"
+  [title]="selectedStatus() ? 'Editar estado' : 'Crear estado'"
+  (closed)="closeStatusModal()"
+>
+  @if (isModalLoading()) {
+    <p class="admin_empty">Cargando...</p>
+  } @else {
+    <app-status-form
+      [status]="selectedStatus()"
+      (save)="saveStatus($event)"
+      (cancel)="closeStatusModal()"
+    />
+  }
+</app-modal>

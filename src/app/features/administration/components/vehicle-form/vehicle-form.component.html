@@ -1,0 +1,28 @@
+<form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-group">
+    <label for="vehicle-tipo">Tipo de vehículo *</label>
+    <select id="vehicle-tipo" formControlName="tipoVehiculoId">
+      <option value="">Seleccione...</option>
+      @for (tipo of tiposVehiculo; track tipo.id) {
+        <option [value]="tipo.id">{{ tipo.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="vehicle-placa">Placa *</label>
+    <input id="vehicle-placa" type="text" formControlName="placa" placeholder="Ej: KHV53D" />
+  </div>
+
+  <div class="form-group">
+    <label for="vehicle-codigo">Código interno *</label>
+    <input id="vehicle-codigo" type="text" formControlName="codigo" placeholder="Ej: 003" />
+  </div>
+
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="cancel.emit()">Cancelar</button>
+    <button type="submit" class="btn-primary">
+      {{ vehicle ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</form>

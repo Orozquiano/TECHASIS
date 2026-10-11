@@ -1,0 +1,301 @@
+<section class="ns">
+  <header class="ns_hero">
+    <p class="ns_eyebrow">Operación</p>
+    <h1>Nuevo servicio</h1>
+    <p>Captura la información del asegurado, la ruta y la aseguradora.</p>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-banner" role="alert">{{ errorMessage() }}</div>
+  }
+
+  @if (infoMessage()) {
+    <div class="ns_info" role="status">{{ infoMessage() }}</div>
+  }
+
+  <form [formGroup]="serviceForm" class="ns_grid" (ngSubmit)="guardarServicio()">
+    <div class="ns_main">
+      <app-card title="Tipo de servicio" [required]="true">
+        <div class="ns_pills" role="listbox" aria-label="Tipo de servicio">
+          @for (tipo of tiposServicio; track tipo.value) {
+            <button
+              type="button"
+              class="ns_pill"
+              [class.is-active]="serviceForm.get('tipoServicio')?.value === tipo.value"
+              (click)="setTipoServicio(tipo.value)"
+            >
+              {{ tipo.label }}
+            </button>
+          }
+        </div>
+      </app-card>
+
+      <app-card title="Información del servicio / asegurado" [required]="true">
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="ns-registro">N° registro (auto)</label>
+            <input
+              id="ns-registro"
+              type="text"
+              formControlName="registroNum"
+              readonly
+              placeholder="Auto-generado"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-nombre">Nombre asegurado *</label>
+            <input
+              id="ns-nombre"
+              type="text"
+              formControlName="nombreAsegurado"
+              placeholder="Ej: Sofía Marzola"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-placa">Placa del vehículo *</label>
+            <input
+              id="ns-placa"
+              type="text"
+              formControlName="placaVehiculo"
+              placeholder="Ej: JFT 123"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-telefono">Teléfono / celular *</label>
+            <select id="ns-telefono" formControlName="telefonoSel">
+              <option value="">— Selecciona —</option>
+              @for (tel of telefonosLista(); track tel.id) {
+                <option [value]="tel.descripcion">{{ tel.descripcion }}</option>
+              }
+            </select>
+            @if (serviceForm.get('telefonoSel')?.value === 'OTRO (Pegar número)') {
+              <input
+                class="ns_otro"
+                type="text"
+                formControlName="telefonoOtro"
+                placeholder="Pega o digita el teléfono"
+              />
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="ns-auth">N° autorización *</label>
+            <input
+              id="ns-auth"
+              type="text"
+              formControlName="numAutorizacion"
+              placeholder="Ej: 26120165"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-fecha">Fecha del servicio *</label>
+            <input id="ns-fecha" type="date" formControlName="fechaServicio" />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-hora">Hora del servicio *</label>
+            <input id="ns-hora" type="time" formControlName="horaServicio" />
+          </div>
+
+          <div class="form-group">
+            <label for="ns-tecnico">Técnico / conductor *</label>
+            <select id="ns-tecnico" formControlName="tecnicoSel">
+              <option value="">— Selecciona conductor —</option>
+              @for (tec of tecnicosLista(); track tec.id) {
+                <option [value]="tec.id">
+                  {{ tec.primerNombre }} {{ tec.primerApellido }}
+                </option>
+              }
+              <option value="OTRO">OTRO</option>
+            </select>
+            @if (serviceForm.get('tecnicoSel')?.value === 'OTRO') {
+              <input
+                class="ns_otro"
+                type="text"
+                formControlName="tecnicoOtro"
+                placeholder="Nombre del conductor"
+              />
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="ns-grua">Placa de la grúa *</label>
+            <select id="ns-grua" formControlName="placaGruaSel">
+              <option value="">— Selecciona placa —</option>
+              @for (grua of gruasLista(); track grua.id) {
+                <option [value]="grua.id">{{ grua.placa }}</option>
+              }
+              <option value="OTRO">OTRO</option>
+            </select>
+            @if (serviceForm.get('placaGruaSel')?.value === 'OTRO') {
+              <input
+                class="ns_otro"
+                type="text"
+                formControlName="placaGruaOtro"
+                placeholder="Placa manual"
+              />
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="ns-estado">Estado del servicio *</label>
+            <select id="ns-estado" formControlName="estadoServicioSel">
+              <option value="">— Selecciona —</option>
+              @for (est of estadoServicioLista(); track est.id) {
+                <option [value]="est.id">{{ est.descripcion }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card title="Ruta del servicio" [required]="true">
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="ns-origen">Origen *</label>
+            <input
+              id="ns-origen"
+              type="text"
+              formControlName="origen"
+              placeholder="Ej: Jamundí, Valle del Cauca"
+            />
+          </div>
+          <div class="form-group">
+            <label for="ns-destino">Destino *</label>
+            <input
+              id="ns-destino"
+              type="text"
+              formControlName="destino"
+              placeholder="Ej: Palmira, Valle del Cauca"
+            />
+          </div>
+          <div class="form-group">
+            <label for="ns-ciudad">Ciudad destino *</label>
+            <input
+              id="ns-ciudad"
+              type="text"
+              formControlName="ciudadDestino"
+              placeholder="Ciudad de destino"
+            />
+          </div>
+          <div class="form-group">
+            <label for="ns-tipoveh">Tipo de vehículo</label>
+            <select id="ns-tipoveh" formControlName="tipoVehiculo">
+              <option value="liviano">Liviano</option>
+              <option value="semipesado">Semipesado</option>
+            </select>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card title="Aseguradora / operador" [required]="true">
+        <div class="ns_pills">
+          @for (aseg of aseguradoraLista(); track aseg.id) {
+            <button
+              type="button"
+              class="ns_pill"
+              [class.is-active]="
+                serviceForm.get('aseguradora')?.value?.toUpperCase() === aseg.nombre.toUpperCase()
+              "
+              (click)="setAseguradora(aseg.nombre.toUpperCase())"
+            >
+              {{ aseg.nombre }}
+            </button>
+          }
+        </div>
+
+        @if (serviceForm.get('aseguradora')?.value?.toUpperCase() === 'OTRO') {
+          <div class="form-group">
+            <label for="ns-aseg-otro">Nombre de la aseguradora *</label>
+            <input
+              id="ns-aseg-otro"
+              type="text"
+              formControlName="aseguradoraOtro"
+              placeholder="Digita el nombre"
+            />
+          </div>
+        }
+
+        @if (serviceForm.get('aseguradora')?.value?.toUpperCase() === 'IKE') {
+          <div class="form-group">
+            <label for="ns-ike">Operadora IKE *</label>
+            <select id="ns-ike" formControlName="operadoraIke">
+              <option value="">— Selecciona operadora —</option>
+              <option value="HDI">HDI</option>
+              <option value="HDI BRANDEADA">HDI BRANDEADA</option>
+              <option value="PREVISORA">PREVISORA</option>
+              <option value="MUNDIAL">MUNDIAL</option>
+              <option value="IKE CORP">IKE CORP</option>
+            </select>
+          </div>
+        }
+      </app-card>
+
+      <app-card title="Kilómetros y adicionales">
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="ns-kmn">Km normal</label>
+            <input id="ns-kmn" type="number" min="0" formControlName="kmNormal" />
+          </div>
+          <div class="form-group">
+            <label for="ns-kmzr">Km zona roja</label>
+            <input id="ns-kmzr" type="number" min="0" formControlName="kmZonaRoja" />
+          </div>
+          <div class="form-group">
+            <label for="ns-concepto">Otro concepto</label>
+            <input id="ns-concepto" type="text" formControlName="otroConcepto" />
+          </div>
+          <div class="form-group">
+            <label for="ns-valor">Otro valor</label>
+            <input id="ns-valor" type="number" min="0" formControlName="otroValor" />
+          </div>
+        </div>
+      </app-card>
+
+      <app-card title="Valor técnico y factura">
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="ns-tarifa">Tarifa del técnico</label>
+            <input id="ns-tarifa" type="text" formControlName="tarifaTecnicoSel" />
+          </div>
+          <div class="form-group">
+            <label for="ns-tarifa-otro">Valor manual</label>
+            <input id="ns-tarifa-otro" type="number" min="0" formControlName="tarifaTecnicoOtro" />
+          </div>
+          <div class="form-group">
+            <label for="ns-ef">Estado de factura</label>
+            <select id="ns-ef" formControlName="estadoFactura">
+              <option value="NO FACTURADO">NO FACTURADO</option>
+              <option value="FACTURADO">FACTURADO</option>
+              <option value="FACTURADO Y PAGADO">FACTURADO Y PAGADO</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ns-factura">Número de factura</label>
+            <input id="ns-factura" type="text" formControlName="numFactura" />
+          </div>
+          <div class="form-group ns_full">
+            <label for="ns-obs">Observaciones</label>
+            <textarea id="ns-obs" formControlName="observaciones" rows="3"></textarea>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <aside class="ns_aside">
+      <app-card title="Resumen">
+        <p class="ns_aside-copy">
+          Revisa los datos obligatorios y guarda el servicio cuando estén listos.
+        </p>
+        <button class="btn-primary ns_full-btn" type="submit">Guardar servicio</button>
+        <button class="btn-secondary ns_full-btn" type="button" (click)="limpiarFormulario()">
+          Limpiar formulario
+        </button>
+      </app-card>
+    </aside>
+  </form>
+</section>

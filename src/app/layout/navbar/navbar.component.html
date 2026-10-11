@@ -1,0 +1,15 @@
+<nav class="navbar" aria-label="Navegación principal">
+  <div class="navbar_items">
+    @for (item of visibleNavItems(); track item.route) {
+      <a
+        class="navbar_link"
+        [routerLink]="['/' + item.route]"
+        routerLinkActive="is-active"
+      >
+        {{ item.label }}
+      </a>
+    }
+  </div>
+
+  <button class="navbar_logout" type="button" (click)="onLogout()">Cerrar sesión</button>
+</nav>

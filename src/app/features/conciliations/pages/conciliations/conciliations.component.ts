@@ -8,6 +8,5 @@ import { Component } from '@angular/core';
   selector: 'app-conciliations',
   imports: [],
   templateUrl: './conciliations.component.html',
-  styleUrl: './conciliations.component.scss',
 })
 export class ConciliationsComponent {}

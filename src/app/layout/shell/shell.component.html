@@ -1,7 +1,11 @@
 <div class="shell">
-  <app-header />
-  <app-navbar />
+  <div class="shell_top">
+    <app-header />
+    <app-navbar />
+  </div>
   <main class="shell_main">
-    <router-outlet />
+    <div class="shell_stage" #stage>
+      <router-outlet />
+    </div>
   </main>
 </div>

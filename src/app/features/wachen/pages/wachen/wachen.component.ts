@@ -8,6 +8,5 @@ import { Component } from '@angular/core';
   selector: 'app-wachen',
   imports: [],
   templateUrl: './wachen.component.html',
-  styleUrl: './wachen.component.scss',
 })
 export class WachenComponent {}

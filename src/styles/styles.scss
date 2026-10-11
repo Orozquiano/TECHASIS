@@ -1,5 +1,6 @@
 @use "tokens";
 @use "forms";
+@use "page";
 
 *,
 *::before,
@@ -25,4 +26,8 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+.shell_stage > :not(router-outlet) {
+  display: block;
 }

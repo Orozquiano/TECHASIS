@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import type {
   CreateUserDTO,
@@ -132,37 +132,49 @@ export class AdministrationComponent implements OnInit {
   /**
    * @function loadUsers
    * @description Recarga el listado de usuarios.
+   * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
-  loadUsers(): void {
-    this.userService.getUsers().subscribe((res) => this.users.set(res.data || []));
+  loadUsers(done?: () => void): void {
+    this.userService.getUsers().subscribe((res) => {
+      this.users.set(res.data || []);
+      done?.();
+    });
   }
 
   /**
    * @function loadVehicles
    * @description Recarga el listado de vehículos.
+   * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
-  loadVehicles(): void {
-    this.vehicleService.getVehicles().subscribe((res) => this.vehicles.set(res.data || []));
+  loadVehicles(done?: () => void): void {
+    this.vehicleService.getVehicles().subscribe((res) => {
+      this.vehicles.set(res.data || []);
+      done?.();
+    });
   }
 
   /**
    * @function loadInsurances
    * @description Recarga el listado de aseguradoras.
+   * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
-  loadInsurances(): void {
-    this.insuranceService
-      .getInsurances()
-      .subscribe((res) => this.insurances.set(res.data || []));
+  loadInsurances(done?: () => void): void {
+    this.insuranceService.getInsurances().subscribe((res) => {
+      this.insurances.set(res.data || []);
+      done?.();
+    });
   }
 
   /**
    * @function loadStatuses
    * @description Recarga el listado de estados de servicio.
+   * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
-  loadStatuses(): void {
-    this.statusService
-      .getServiceStatuses()
-      .subscribe((res) => this.statuses.set(res.data || []));
+  loadStatuses(done?: () => void): void {
+    this.statusService.getServiceStatuses().subscribe((res) => {
+      this.statuses.set(res.data || []);
+      done?.();
+    });
   }
 
   /**
@@ -172,36 +184,51 @@ export class AdministrationComponent implements OnInit {
    */
   toggleSection(section: 'users' | 'vehicles' | 'insurances' | 'statuses'): void {
     if (section === 'users') {
-      const next = !this.isUsersOpen();
-      this.isUsersOpen.set(next);
-      if (next && this.users().length === 0) {
-        this.loadUsers();
-      }
+      this.toggleLoadedSection(this.isUsersOpen, this.users().length > 0, (done) => this.loadUsers(done));
     }
 
     if (section === 'vehicles') {
-      const next = !this.isVehiclesOpen();
-      this.isVehiclesOpen.set(next);
-      if (next && this.vehicles().length === 0) {
-        this.loadVehicles();
-      }
+      this.toggleLoadedSection(this.isVehiclesOpen, this.vehicles().length > 0, (done) =>
+        this.loadVehicles(done),
+      );
     }
 
     if (section === 'insurances') {
-      const next = !this.isInsurancesOpen();
-      this.isInsurancesOpen.set(next);
-      if (next && this.insurances().length === 0) {
-        this.loadInsurances();
-      }
+      this.toggleLoadedSection(this.isInsurancesOpen, this.insurances().length > 0, (done) =>
+        this.loadInsurances(done),
+      );
     }
 
     if (section === 'statuses') {
-      const next = !this.isStatusesOpen();
-      this.isStatusesOpen.set(next);
-      if (next && this.statuses().length === 0) {
-        this.loadStatuses();
-      }
+      this.toggleLoadedSection(this.isStatusesOpen, this.statuses().length > 0, (done) =>
+        this.loadStatuses(done),
+      );
     }
+  }
+
+  /**
+   * @function toggleLoadedSection
+   * @description Cierra la sección o la abre cuando sus datos ya están listos para animarse.
+   * @param open Estado de apertura de la sección.
+   * @param hasData Indica si el listado ya fue cargado.
+   * @param load Carga el listado y avisa cuando terminó.
+   */
+  private toggleLoadedSection(
+    open: WritableSignal<boolean>,
+    hasData: boolean,
+    load: (done: () => void) => void,
+  ): void {
+    if (open()) {
+      open.set(false);
+      return;
+    }
+
+    if (!hasData) {
+      load(() => open.set(true));
+      return;
+    }
+
+    open.set(true);
   }
 
   /**

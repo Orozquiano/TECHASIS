@@ -1,4 +1,5 @@
-import { Component, input, output } from '@angular/core';
+import { afterNextRender, Component, effect, ElementRef, inject, input, output } from '@angular/core';
+import { PageOverlayService } from '../../overlay/page-overlay.service';
 
 /**
  * @class ModalComponent
@@ -11,6 +12,9 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './modal.component.scss',
 })
 export class ModalComponent {
+  private readonly pageOverlay = inject(PageOverlayService);
+  private readonly host = inject(ElementRef<HTMLElement>);
+
   /**
    * @description Controla la visibilidad del modal.
    */
@@ -25,6 +29,21 @@ export class ModalComponent {
    * @description Evento emitido al cerrar el modal.
    */
   readonly closed = output<void>();
+
+  constructor() {
+    afterNextRender(() => {
+      document.body.appendChild(this.host.nativeElement);
+    });
+
+    effect((onCleanup) => {
+      if (!this.isOpen()) {
+        return;
+      }
+
+      this.pageOverlay.acquire();
+      onCleanup(() => this.pageOverlay.release());
+    });
+  }
 
   /**
    * @function close

@@ -4,29 +4,7 @@
 }
 
 .ns_hero {
-  padding: 8px 4px 4px;
-
-  h1 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
-    letter-spacing: -0.045em;
-  }
-
-  p {
-    margin: 8px 0 0;
-    color: var(--muted);
-    max-width: 40rem;
-  }
-}
-
-.ns_eyebrow {
-  margin: 0 0 8px !important;
-  color: var(--brand-secondary) !important;
-  font-size: 0.8rem !important;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 4px 0 8px;
 }
 
 .ns_info {
@@ -51,7 +29,7 @@
 
 .ns_aside {
   position: sticky;
-  top: 16px;
+  top: 132px;
 }
 
 .ns_aside-copy {
@@ -67,12 +45,12 @@
 }
 
 .ns_pill {
-  min-height: 40px;
-  padding: 0 14px;
+  min-height: var(--touch);
+  padding: 0 16px;
   color: var(--muted);
-  font-weight: 600;
-  background: #fbfcfd;
-  border: 1px solid var(--line);
+  font-weight: 500;
+  background: var(--fill-secondary);
+  border: 0;
   border-radius: 999px;
   cursor: pointer;
   transition:
@@ -82,7 +60,12 @@
 
   &:hover {
     color: var(--text);
-    border-color: color-mix(in srgb, var(--brand-secondary) 45%, var(--line));
+    background: color-mix(in srgb, var(--brand-primary) 12%, var(--canvas));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-secondary);
+    outline-offset: 2px;
   }
 
   &.is-active {

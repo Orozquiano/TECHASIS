@@ -10,6 +10,13 @@
   --danger: #b42318;
   --danger-soft: #fef3f2;
   --focus: color-mix(in srgb, var(--brand-secondary) 35%, white);
+  --separator: color-mix(in srgb, var(--line) 80%, transparent);
+  --fill-secondary: color-mix(in srgb, var(--brand-primary) 8%, var(--canvas));
+  --material: color-mix(in srgb, var(--surface) 86%, transparent);
+  --radius-control: 12px;
+  --radius-group: 18px;
+  --radius-sheet: 22px;
+  --touch: 44px;
   --font-sans: "DM Sans", "Segoe UI", sans-serif;
   --font-display: "Syne", "DM Sans", sans-serif;
   --shadow-soft: 0 18px 40px rgb(16 32 51 / 8%);

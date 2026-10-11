@@ -4,10 +4,10 @@
 }
 
 .card {
-  padding: 20px 22px;
+  padding: 18px 18px 16px;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-group);
 }
 
 .card_title {

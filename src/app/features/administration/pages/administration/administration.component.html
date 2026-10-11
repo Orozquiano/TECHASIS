@@ -20,7 +20,8 @@
       <button class="btn-primary" type="button" (click)="openUserModal()">Crear</button>
     </header>
 
-    @if (isUsersOpen()) {
+    <div class="admin_panel" [class.is-open]="isUsersOpen()">
+      <div class="admin_panel_inner">
       <div class="admin_grid">
         @for (user of filteredUsers(); track user.id) {
           <article class="admin_item">
@@ -37,7 +38,8 @@
           <p class="admin_empty">No hay usuarios registrados.</p>
         }
       </div>
-    }
+      </div>
+    </div>
   </section>
 
   <section class="admin_section">
@@ -55,7 +57,8 @@
       <button class="btn-primary" type="button" (click)="openVehicleModal()">Crear</button>
     </header>
 
-    @if (isVehiclesOpen()) {
+    <div class="admin_panel" [class.is-open]="isVehiclesOpen()">
+      <div class="admin_panel_inner">
       <div class="admin_grid">
         @for (vehicle of filteredVehicles(); track vehicle.id) {
           <article class="admin_item">
@@ -74,7 +77,8 @@
           <p class="admin_empty">No hay vehículos registrados.</p>
         }
       </div>
-    }
+      </div>
+    </div>
   </section>
 
   <section class="admin_section">
@@ -92,7 +96,8 @@
       <button class="btn-primary" type="button" (click)="openInsuranceModal()">Crear</button>
     </header>
 
-    @if (isInsurancesOpen()) {
+    <div class="admin_panel" [class.is-open]="isInsurancesOpen()">
+      <div class="admin_panel_inner">
       <div class="admin_grid">
         @for (insurance of filteredInsurances(); track insurance.id) {
           <article class="admin_item">
@@ -111,7 +116,8 @@
           <p class="admin_empty">No hay aseguradoras registradas.</p>
         }
       </div>
-    }
+      </div>
+    </div>
   </section>
 
   <section class="admin_section">
@@ -129,7 +135,8 @@
       <button class="btn-primary" type="button" (click)="openStatusModal()">Crear</button>
     </header>
 
-    @if (isStatusesOpen()) {
+    <div class="admin_panel" [class.is-open]="isStatusesOpen()">
+      <div class="admin_panel_inner">
       <div class="admin_grid">
         @for (status of filteredStatuses(); track status.id) {
           <article class="admin_item">
@@ -148,7 +155,8 @@
           <p class="admin_empty">No hay estados registrados.</p>
         }
       </div>
-    }
+      </div>
+    </div>
   </section>
 </section>
 

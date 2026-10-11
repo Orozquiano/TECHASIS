@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
 import { APP_ENVIRONMENT } from '../config/app-environment';
+import { THEME_STORAGE_KEY } from '../theme/theme.constants';
 import type {
   AuthUserData,
   LoginRequest,
@@ -148,10 +149,26 @@ export class AuthService {
 
   /**
    * @function logout
-   * @description Limpia la sesión del usuario en ambos almacenamientos.
+   * @description Limpia la sesión del usuario en ambos almacenamientos,
+   * conservando la preferencia visual de tema del usuario.
    */
   logout(): void {
+    let themePreference: string | null = null;
+    try {
+      themePreference = localStorage.getItem(THEME_STORAGE_KEY);
+    } catch {
+      themePreference = null;
+    }
+
     localStorage.clear();
     sessionStorage.clear();
+
+    if (themePreference === 'light' || themePreference === 'dark') {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, themePreference);
+      } catch {
+        // Persistencia opcional del tema tras cerrar sesión.
+      }
+    }
   }
 }

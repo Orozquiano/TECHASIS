@@ -9,9 +9,9 @@
 
 .ns_info {
   padding: 12px 14px;
-  color: var(--brand-primary);
-  background: color-mix(in srgb, var(--brand-secondary) 12%, white);
-  border: 1px solid color-mix(in srgb, var(--brand-secondary) 30%, white);
+  color: var(--text);
+  background: color-mix(in srgb, var(--brand-secondary) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--brand-secondary) 30%, var(--line));
   border-radius: 12px;
 }
 
@@ -60,7 +60,7 @@
 
   &:hover {
     color: var(--text);
-    background: color-mix(in srgb, var(--brand-primary) 12%, var(--canvas));
+    background: color-mix(in srgb, var(--ink) 12%, var(--canvas));
   }
 
   &:focus-visible {
@@ -69,7 +69,7 @@
   }
 
   &.is-active {
-    color: var(--surface);
+    color: var(--brand-on-primary);
     background: var(--brand-primary);
     border-color: var(--brand-primary);
   }

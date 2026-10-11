@@ -34,7 +34,7 @@
     background-color 0.15s ease;
 
   &::placeholder {
-    color: #8b98a6;
+    color: var(--placeholder);
   }
 
   &:focus {
@@ -83,7 +83,7 @@
 }
 
 .btn-primary {
-  color: #f7fafc;
+  color: var(--brand-on-primary);
   background: var(--brand-primary);
   border: 0;
 
@@ -98,12 +98,12 @@
 }
 
 .btn-secondary {
-  color: var(--brand-primary);
+  color: var(--ink);
   background: var(--fill-secondary);
   border: 0;
 
   &:hover {
-    background: color-mix(in srgb, var(--brand-primary) 14%, var(--canvas));
+    background: color-mix(in srgb, var(--ink) 14%, var(--canvas));
   }
 }
 
@@ -145,7 +145,7 @@
   padding: 12px 14px;
   color: var(--danger);
   background: var(--danger-soft);
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, white);
+  border: 1px solid var(--danger-border);
   border-radius: 12px;
   font-size: 0.9rem;
 }
@@ -159,7 +159,7 @@
 
 .is-invalid {
   border-color: var(--danger) !important;
-  background: #fff8f7 !important;
+  background: var(--danger-soft) !important;
 }
 
 .grid-2 {

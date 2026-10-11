@@ -7,11 +7,11 @@
   margin: 4px 16px 12px;
   padding: 4px 6px 4px 4px;
   background: color-mix(in srgb, var(--surface) 72%, transparent);
-  border: 0.5px solid color-mix(in srgb, white 70%, var(--line));
+  border: 0.5px solid var(--glass-border);
   border-radius: 15px;
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, white 80%, transparent),
-    0 10px 28px rgb(16 32 51 / 8%);
+    inset 0 1px 0 var(--glass-highlight),
+    var(--shadow-nav);
   backdrop-filter: blur(22px) saturate(1.6);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   animation: nav-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -69,11 +69,11 @@
 
   &:hover:not(.is-active) {
     color: var(--text);
-    background: color-mix(in srgb, var(--brand-primary) 6%, transparent);
+    background: var(--fill-hover);
   }
 
   &.is-active {
-    color: var(--brand-primary);
+    color: var(--ink);
     font-weight: 600;
     background: transparent;
   }
@@ -85,7 +85,7 @@
 }
 
 .navbar_items:has(.navbar_pill.is-ready) .navbar_link.is-active {
-  color: var(--surface);
+  color: var(--brand-on-primary);
 }
 
 .tabbar,
@@ -150,11 +150,11 @@
     height: 64px;
     padding: 6px;
     background: color-mix(in srgb, var(--surface) 74%, transparent);
-    border: 0.5px solid color-mix(in srgb, white 72%, var(--line));
+    border: 0.5px solid var(--glass-border);
     border-radius: 28px;
     box-shadow:
-      inset 0 1px 0 color-mix(in srgb, white 80%, transparent),
-      0 10px 28px rgb(16 32 51 / 12%);
+      inset 0 1px 0 var(--glass-highlight),
+      var(--shadow-nav);
     backdrop-filter: blur(24px) saturate(1.7);
     -webkit-backdrop-filter: blur(24px) saturate(1.7);
 
@@ -187,7 +187,7 @@
     cursor: pointer;
 
     &.is-active {
-      color: var(--brand-primary);
+      color: var(--ink);
       font-weight: 600;
       background: transparent;
     }
@@ -199,7 +199,7 @@
   }
 
   .tabbar:has(.tabbar_pill.is-ready) .tabbar_item.is-active {
-    color: var(--surface);
+    color: var(--brand-on-primary);
   }
 
   .tabbar_label {
@@ -217,7 +217,7 @@
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: none;
-    background: rgb(16 32 51 / 28%);
+    background: var(--overlay);
     border: 0;
     cursor: pointer;
   }
@@ -236,10 +236,10 @@
     overflow: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    background: color-mix(in srgb, var(--surface) 86%, transparent);
-    border: 0.5px solid color-mix(in srgb, white 72%, var(--line));
+    background: var(--material);
+    border: 0.5px solid var(--glass-border);
     border-radius: 22px;
-    box-shadow: 0 16px 40px rgb(16 32 51 / 16%);
+    box-shadow: var(--shadow-panel);
     backdrop-filter: blur(28px) saturate(1.6);
     -webkit-backdrop-filter: blur(28px) saturate(1.6);
     animation: sheet-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -290,8 +290,8 @@
     border-radius: 12px;
 
     &.is-active {
-      color: var(--brand-primary);
-      background: color-mix(in srgb, var(--brand-primary) 8%, transparent);
+      color: var(--ink);
+      background: var(--fill-hover);
     }
 
     &:focus-visible {

@@ -1,12 +1,12 @@
 :host {
-  --login-ink: var(--brand-primary, #102033);
-  --login-accent: var(--brand-secondary, #2f8ca8);
-  --login-canvas: #eef2f5;
-  --login-surface: #ffffff;
-  --login-text: #172033;
-  --login-muted: #5d6b7c;
-  --login-line: #d5dee7;
-  --login-focus: color-mix(in srgb, var(--login-accent) 35%, white);
+  --login-ink: var(--brand-primary);
+  --login-accent: var(--brand-secondary);
+  --login-canvas: var(--canvas);
+  --login-surface: var(--surface);
+  --login-text: var(--text);
+  --login-muted: var(--muted);
+  --login-line: var(--line);
+  --login-focus: var(--focus);
 
   display: block;
   min-height: 100dvh;
@@ -33,7 +33,7 @@
   align-items: flex-end;
   overflow: hidden;
   padding: 48px;
-  color: #f4f7fa;
+  color: var(--brand-on-primary);
   background:
     radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--login-accent) 55%, transparent), transparent 58%),
     var(--login-ink);
@@ -74,7 +74,7 @@
   height: 42px;
   place-items: center;
   color: var(--login-ink);
-  background: #f4f7fa;
+  background: var(--brand-on-primary);
   border-radius: 12px;
 
   img,
@@ -97,7 +97,7 @@
 .login_lead {
   max-width: 28rem;
   margin: 20px 0 0;
-  color: rgb(244 247 250 / 78%);
+  color: color-mix(in srgb, var(--brand-on-primary) 78%, transparent);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -155,20 +155,20 @@
   padding: 0 16px;
   color: var(--login-text);
   font: inherit;
-  background: #fbfcfd;
+  background: var(--surface-secondary);
   border: 1px solid var(--login-line);
   border-radius: 14px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
   &::placeholder {
-    color: #8b98a6;
+    color: var(--placeholder);
   }
 
   &:focus {
     border-color: var(--login-accent);
     box-shadow: 0 0 0 4px var(--login-focus);
-    background: #fff;
+    background: var(--login-surface);
   }
 }
 
@@ -198,7 +198,7 @@
 
   &:hover {
     color: var(--login-text);
-    background: #eef3f6;
+    background: var(--fill-secondary);
   }
 
   &:focus-visible {
@@ -210,9 +210,9 @@
 .login_demo {
   margin-bottom: 18px;
   padding: 12px 14px;
-  color: var(--login-ink);
-  background: color-mix(in srgb, var(--login-accent) 14%, white);
-  border: 1px solid color-mix(in srgb, var(--login-accent) 35%, white);
+  color: var(--text);
+  background: color-mix(in srgb, var(--login-accent) 14%, var(--login-surface));
+  border: 1px solid color-mix(in srgb, var(--login-accent) 35%, var(--login-line));
   border-radius: 12px;
   font-size: 0.9rem;
   line-height: 1.4;
@@ -221,9 +221,9 @@
 .login_error {
   margin-bottom: 18px;
   padding: 12px 14px;
-  color: #b42318;
-  background: #fef3f2;
-  border: 1px solid #fecdca;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
   border-radius: 12px;
   font-size: 0.9rem;
 }
@@ -249,7 +249,7 @@
   width: 100%;
   height: 48px;
   margin-top: 22px;
-  color: #f7fafc;
+  color: var(--brand-on-primary);
   font: inherit;
   font-weight: 600;
   background: var(--login-ink);

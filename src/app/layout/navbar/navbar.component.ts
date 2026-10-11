@@ -175,6 +175,15 @@ export class NavbarComponent implements OnInit {
       }
     });
 
+    effect((onCleanup) => {
+      if (!this.moreOpen()) {
+        return;
+      }
+
+      this.pageOverlay.acquireScrollLock();
+      onCleanup(() => this.pageOverlay.releaseScrollLock());
+    });
+
     afterRenderEffect(() => {
       this.currentUrl();
       this.visibleNavItems();

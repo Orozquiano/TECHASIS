@@ -8,6 +8,5 @@ import { Component } from '@angular/core';
   selector: 'app-files',
   imports: [],
   templateUrl: './files.component.html',
-  styleUrl: './files.component.scss',
 })
 export class FilesComponent {}

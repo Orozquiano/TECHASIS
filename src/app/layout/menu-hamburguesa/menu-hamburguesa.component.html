@@ -1,0 +1,93 @@
+<div class="menu">
+  <button
+    class="menu_trigger"
+    type="button"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="isOpen()"
+    aria-label="Abrir menú de usuario"
+    (click)="toggleMenu($event)"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path
+        d="M5.5 19.2c1.2-3.1 3.5-4.6 6.5-4.6s5.3 1.5 6.5 4.6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <div class="menu_panel" role="menu">
+      <div class="menu_identity">
+        <p class="menu_name">{{ userName }}</p>
+        <p class="menu_id">Identificación {{ identification }}</p>
+      </div>
+
+      <div class="menu_theme" role="none">
+        <div class="menu_theme-row">
+          <span class="menu_theme-label" id="theme-toggle-label">
+            <span class="menu_theme-icon" aria-hidden="true">
+              @if (resolvedTheme() === 'dark') {
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M15.5 3.5a8.2 8.2 0 1 0 5 12.4A7 7 0 1 1 15.5 3.5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <path
+                    d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              }
+            </span>
+            Modo oscuro
+          </span>
+
+          <button
+            class="theme_switch"
+            type="button"
+            role="switch"
+            [attr.aria-checked]="resolvedTheme() === 'dark'"
+            aria-labelledby="theme-toggle-label"
+            (click)="onThemeToggle($event)"
+            (keydown)="onThemeKeydown($event)"
+          >
+            <span class="theme_switch-track">
+              <span class="theme_switch-thumb"></span>
+            </span>
+          </button>
+        </div>
+
+        @if (themeMode() !== 'auto') {
+          <button
+            class="menu_theme-auto"
+            type="button"
+            role="menuitem"
+            (click)="onUseSystemTheme($event)"
+          >
+            Usar tema del sistema
+          </button>
+        } @else {
+          <p class="menu_theme-hint">Automático · sigue al sistema</p>
+        }
+      </div>
+
+      <button class="menu_logout" type="button" role="menuitem" (click)="onLogout()">
+        Cerrar sesión
+      </button>
+    </div>
+  }
+</div>

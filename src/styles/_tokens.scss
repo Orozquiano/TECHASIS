@@ -1,16 +1,90 @@
-
-:root {
+:root,
+[data-theme='light'] {
   --brand-primary: #102033;
   --brand-secondary: #2f8ca8;
+  --brand-on-primary: #f7fafc;
+  --ink: #102033;
   --canvas: #eef2f5;
   --surface: #ffffff;
+  --surface-secondary: #f4f7fa;
   --text: #172033;
   --muted: #5d6b7c;
+  --placeholder: #8b98a6;
   --line: #d5dee7;
   --danger: #b42318;
   --danger-soft: #fef3f2;
+  --danger-border: #fecdca;
+  --success: #067647;
+  --success-soft: #ecfdf3;
+  --warning: #b54708;
+  --warning-soft: #fffaeb;
+  --info: #175cd3;
+  --info-soft: #eff8ff;
+  --link: #2f8ca8;
+  --overlay: rgb(16 32 51 / 28%);
   --focus: color-mix(in srgb, var(--brand-secondary) 35%, white);
+  --separator: color-mix(in srgb, var(--line) 80%, transparent);
+  --fill-secondary: color-mix(in srgb, var(--brand-primary) 8%, var(--canvas));
+  --fill-hover: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+  --material: color-mix(in srgb, var(--surface) 86%, transparent);
+  --glass-border: color-mix(in srgb, white 70%, var(--line));
+  --glass-highlight: color-mix(in srgb, white 80%, transparent);
+  --disabled: color-mix(in srgb, var(--muted) 55%, var(--canvas));
+  --loader: var(--brand-secondary);
+  --radius-control: 12px;
+  --radius-group: 18px;
+  --radius-sheet: 22px;
+  --touch: 44px;
   --font-sans: "DM Sans", "Segoe UI", sans-serif;
   --font-display: "Syne", "DM Sans", sans-serif;
   --shadow-soft: 0 18px 40px rgb(16 32 51 / 8%);
+  --shadow-panel: 0 12px 40px rgb(16 32 51 / 16%);
+  --shadow-nav: 0 10px 28px rgb(16 32 51 / 8%);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --brand-primary: #102033;
+  --brand-secondary: #3aa3c2;
+  --brand-on-primary: #f4f7fa;
+  --ink: #e8eef5;
+  --canvas: #121820;
+  --surface: #1c2430;
+  --surface-secondary: #243041;
+  --text: #eef2f6;
+  --muted: #9aa7b8;
+  --placeholder: #7d8b9c;
+  --line: #334155;
+  --danger: #f97066;
+  --danger-soft: color-mix(in srgb, #f97066 16%, var(--surface));
+  --danger-border: color-mix(in srgb, #f97066 42%, var(--line));
+  --success: #32d583;
+  --success-soft: color-mix(in srgb, #32d583 14%, var(--surface));
+  --warning: #fdb022;
+  --warning-soft: color-mix(in srgb, #fdb022 14%, var(--surface));
+  --info: #84caff;
+  --info-soft: color-mix(in srgb, #84caff 14%, var(--surface));
+  --link: #5ec4e0;
+  --overlay: rgb(4 8 14 / 62%);
+  --focus: color-mix(in srgb, var(--brand-secondary) 40%, transparent);
+  --separator: color-mix(in srgb, var(--line) 88%, transparent);
+  --fill-secondary: color-mix(in srgb, var(--ink) 10%, var(--canvas));
+  --fill-hover: color-mix(in srgb, var(--ink) 12%, transparent);
+  --material: color-mix(in srgb, var(--surface) 88%, transparent);
+  --glass-border: color-mix(in srgb, white 12%, var(--line));
+  --glass-highlight: color-mix(in srgb, white 8%, transparent);
+  --disabled: color-mix(in srgb, var(--muted) 40%, var(--canvas));
+  --loader: var(--brand-secondary);
+  --shadow-soft: 0 18px 40px rgb(0 0 0 / 35%);
+  --shadow-panel: 0 16px 42px rgb(0 0 0 / 42%);
+  --shadow-nav: 0 10px 28px rgb(0 0 0 / 28%);
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-transition body {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
 }

@@ -1,10 +1,20 @@
 
 .shell {
   min-height: 100dvh;
+  isolation: isolate;
   background:
     radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand-secondary) 16%, transparent), transparent 42%),
     radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--brand-primary) 10%, transparent), transparent 38%),
     var(--canvas);
+  background-attachment: fixed;
+}
+
+.shell_top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: inherit;
+  background-attachment: fixed;
 }
 
 .shell_main {
@@ -14,25 +24,37 @@
   animation: main-in 0.45s ease 0.08s both;
 }
 
+.shell_stage[data-nav] {
+  overflow: clip;
+}
+
 @keyframes main-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: none;
+  }
+}
+
+@media (max-width: 1080px) {
+  .shell_main {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom));
   }
 }
 
 @media (max-width: 720px) {
   .shell_main {
-    padding: 0 12px 36px;
+    padding: 0 12px calc(108px + env(safe-area-inset-bottom));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .shell_main {
     animation: none;
+  }
+
+  .shell_stage[data-nav] {
+    overflow: visible;
   }
 }

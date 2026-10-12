@@ -1,0 +1,34 @@
+.placeholder {
+  padding: 4px 0 8px;
+}
+
+.placeholder_eyebrow,
+.ns_eyebrow,
+.admin_eyebrow {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.placeholder h1,
+.ns_hero h1,
+.admin_hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.125rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.placeholder p:last-child,
+.ns_hero p,
+.admin_hero p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  max-width: 40rem;
+  line-height: 1.45;
+}

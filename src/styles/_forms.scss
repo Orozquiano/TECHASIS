@@ -6,10 +6,11 @@
 .field_label,
 .form-group > label {
   display: block;
-  margin-bottom: 8px;
-  color: var(--text);
-  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .field_input,
@@ -19,13 +20,13 @@
 .admin-search,
 .search-input {
   width: 100%;
-  min-height: 46px;
+  min-height: var(--touch);
   padding: 0 14px;
   color: var(--text);
   font: inherit;
-  background: #fbfcfd;
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  background: var(--surface);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-control);
   outline: none;
   transition:
     border-color 0.15s ease,
@@ -33,7 +34,7 @@
     background-color 0.15s ease;
 
   &::placeholder {
-    color: #8b98a6;
+    color: var(--placeholder);
   }
 
   &:focus {
@@ -63,21 +64,26 @@
 }
 
 .btn-primary,
-.btn-secondary {
-  min-height: 44px;
+.btn-secondary,
+.btn-danger {
+  min-height: var(--touch);
   padding: 0 16px;
   font: inherit;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   cursor: pointer;
   transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease;
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-secondary);
+    outline-offset: 2px;
+  }
 }
 
 .btn-primary {
-  color: #f7fafc;
+  color: var(--brand-on-primary);
   background: var(--brand-primary);
   border: 0;
 
@@ -92,13 +98,23 @@
 }
 
 .btn-secondary {
-  color: var(--text);
-  background: transparent;
-  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--fill-secondary);
+  border: 0;
 
   &:hover {
-    border-color: var(--brand-secondary);
-    color: var(--brand-secondary);
+    background: color-mix(in srgb, var(--ink) 14%, var(--canvas));
+  }
+}
+
+.btn-danger {
+  color: var(--danger);
+  font-weight: 500;
+  background: transparent;
+  border: 0;
+
+  &:hover {
+    background: var(--danger-soft);
   }
 }
 
@@ -129,7 +145,7 @@
   padding: 12px 14px;
   color: var(--danger);
   background: var(--danger-soft);
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, white);
+  border: 1px solid var(--danger-border);
   border-radius: 12px;
   font-size: 0.9rem;
 }
@@ -143,7 +159,7 @@
 
 .is-invalid {
   border-color: var(--danger) !important;
-  background: #fff8f7 !important;
+  background: var(--danger-soft) !important;
 }
 
 .grid-2 {

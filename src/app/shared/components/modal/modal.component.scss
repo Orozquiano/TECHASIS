@@ -1,3 +1,6 @@
+:host {
+  display: contents;
+}
 
 .modal-backdrop {
   position: fixed;
@@ -6,8 +9,12 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(16 32 51 / 55%);
-  backdrop-filter: blur(4px);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   animation: modal-fade 0.2s ease;
 }
 
@@ -15,10 +22,15 @@
   width: min(100%, 520px);
   max-height: min(90dvh, 720px);
   overflow: auto;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px rgb(16 32 51 / 18%);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: var(--material);
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
   animation: modal-rise 0.28s ease;
 }
 
@@ -40,8 +52,8 @@
 
 .modal-close {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: var(--touch);
+  height: var(--touch);
   place-items: center;
   color: var(--muted);
   background: transparent;
@@ -81,6 +93,21 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .modal-backdrop {
+    align-items: end;
+    justify-items: stretch;
+    padding: 0;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-height: min(88dvh, 720px);
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 

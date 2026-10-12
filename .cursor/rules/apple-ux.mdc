@@ -1,0 +1,17 @@
+---
+description: Lineamientos de UX de Apple para la interfaz autenticada de Techasis
+alwaysApply: true
+---
+
+# UX de Apple en Techasis
+
+Aplica estas pautas en toda la interfaz autenticada. No restyles `login` salvo que se pida.
+
+- El contenido manda. El cromo es translúcido (`backdrop-filter`), con borde de 0.5px y sombra suave. Usa los tokens `--material`, `--separator`, `--fill-secondary`, `--radius-control`, `--radius-group`, `--radius-sheet` y `--touch`.
+- Todo control interactivo mide al menos 44px. El foco visible usa un anillo de 2px en `--brand-secondary`.
+- Escritorio: navegación en la cápsula. Por debajo de 1080px: barra inferior con icono y etiqueta; si hay más de cinco destinos, los sobrantes van en Más.
+- Títulos de página grandes, a la izquierda, con tracking cerrado. Las etiquetas de campo son secundarias y van encima del control.
+- Acción principal: relleno `--brand-primary`. Secundaria: `--fill-secondary`, sin borde. Destructiva: texto `--danger`, nunca el mismo peso visual que la acción principal.
+- Listas y formularios van en grupos con esquinas continuas. En móvil, un diálogo es una hoja desde abajo.
+- Respeta `prefers-reduced-motion` y `env(safe-area-inset-bottom)`.
+- No inventes módulos, endpoints ni marcas de empresa. Los colores de marca salen de los tokens, no de un cliente fijo.

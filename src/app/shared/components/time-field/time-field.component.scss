@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.picker {
+  position: relative;
+}
+
+.picker_trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0 14px;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  background: var(--surface);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+
+  &.is-empty {
+    color: var(--placeholder);
+  }
+
+  &:focus-visible {
+    border-color: var(--brand-secondary);
+    box-shadow: 0 0 0 4px var(--focus);
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.picker.is-up .picker_menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.picker_value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker_icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.picker_menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: 100%;
+  min-width: 220px;
+  padding: 12px;
+  background: var(--surface-secondary);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-group);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  animation: time-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.time_head,
+.time_board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.time_head {
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.time_col {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  max-height: 220px;
+  overflow: auto;
+  padding: 2px;
+}
+
+.time_option,
+.time_now {
+  min-height: var(--touch);
+  color: var(--text);
+  font: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--fill-hover);
+    outline: none;
+  }
+}
+
+.time_option.is-selected {
+  color: var(--brand-on-fill);
+  background: var(--brand-fill);
+  font-weight: 600;
+}
+
+.time_now {
+  width: 100%;
+  margin-top: 6px;
+  color: var(--brand-secondary);
+  font-weight: 600;
+}
+
+@keyframes time-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picker_menu {
+    animation: none;
+  }
+}

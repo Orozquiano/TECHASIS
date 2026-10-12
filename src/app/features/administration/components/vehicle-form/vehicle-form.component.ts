@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { SaveVehicleDTO, TipoVehiculo, Vehicle } from '../../../../core/models';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class VehicleFormComponent
@@ -16,7 +17,7 @@ import type { SaveVehicleDTO, TipoVehiculo, Vehicle } from '../../../../core/mod
  */
 @Component({
   selector: 'app-vehicle-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SelectComponent],
   templateUrl: './vehicle-form.component.html',
   styleUrl: './vehicle-form.component.scss',
 })
@@ -28,6 +29,19 @@ export class VehicleFormComponent implements OnChanges {
   @Output() save = new EventEmitter<SaveVehicleDTO>();
   @Output() cancel = new EventEmitter<void>();
 
+  /**
+   * @description Opciones del tipo de vehículo.
+   */
+  protected get tipoVehiculoOptions(): SelectOption[] {
+    return this.tiposVehiculo.map((tipo) => ({
+      value: String(tipo.id),
+      label: tipo.nombre,
+    }));
+  }
+
+  /**
+   * @description Grupo de controles del formulario de vehículo.
+   */
   protected readonly vehicleForm = this.fb.group({
     tipoVehiculoId: ['', Validators.required],
     placa: ['', Validators.required],

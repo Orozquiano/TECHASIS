@@ -1,12 +1,12 @@
 <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="form-container">
   <div class="form-group">
     <label for="user-tipo-doc">Tipo de documento *</label>
-    <select id="user-tipo-doc" formControlName="tipoDocumentoId">
-      <option value="">Seleccione...</option>
-      @for (tipo of tiposDocumento; track tipo.id) {
-        <option [value]="tipo.id">{{ tipo.nombre }} ({{ tipo.codigo }})</option>
-      }
-    </select>
+    <app-select
+      inputId="user-tipo-doc"
+      formControlName="tipoDocumentoId"
+      placeholder="— Selecciona —"
+      [options]="tipoDocumentoOptions"
+    />
   </div>
 
   <div class="form-group">
@@ -16,12 +16,12 @@
 
   <div class="form-group">
     <label for="user-rol">Rol *</label>
-    <select id="user-rol" formControlName="rolId">
-      <option value="">Seleccione...</option>
-      @for (rol of roles; track rol.id) {
-        <option [value]="rol.id">{{ rol.nombre }}</option>
-      }
-    </select>
+    <app-select
+      inputId="user-rol"
+      formControlName="rolId"
+      placeholder="— Selecciona —"
+      [options]="rolOptions"
+    />
   </div>
 
   <div class="form-row">

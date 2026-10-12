@@ -69,9 +69,9 @@
   }
 
   &.is-active {
-    color: var(--brand-on-primary);
-    background: var(--brand-primary);
-    border-color: var(--brand-primary);
+    color: var(--brand-on-fill);
+    background: var(--brand-fill);
+    border-color: var(--brand-fill);
   }
 }
 

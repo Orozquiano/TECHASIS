@@ -1,0 +1,58 @@
+<div class="picker" [class.is-up]="dropUp()">
+  <button
+    #trigger
+    class="picker_trigger"
+    type="button"
+    [id]="inputId()"
+    [disabled]="disabled()"
+    [class.is-empty]="!label()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="dialog"
+    (click)="toggle()"
+  >
+    <span class="picker_value">{{ label() || placeholder() }}</span>
+    <svg class="picker_icon" viewBox="0 0 20 20" aria-hidden="true">
+      <rect x="3.5" y="4.5" width="13" height="12" rx="2" />
+      <path d="M3.5 8.5h13M7 3.5v3M13 3.5v3" />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <div #menu class="picker_menu calendar" role="dialog" aria-label="Calendario">
+      <div class="calendar_head">
+        <button class="calendar_nav" type="button" aria-label="Mes anterior" (click)="shiftMonth(-1)">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 5 7 10l5 5" /></svg>
+        </button>
+        <p class="calendar_title">{{ monthTitle() }}</p>
+        <button class="calendar_nav" type="button" aria-label="Mes siguiente" (click)="shiftMonth(1)">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5" /></svg>
+        </button>
+      </div>
+
+      <div class="calendar_week" aria-hidden="true">
+        @for (day of weekdays; track day) {
+          <span>{{ day }}</span>
+        }
+      </div>
+
+      @for (week of weeks(); track $index) {
+        <div class="calendar_week">
+          @for (date of week; track $index) {
+            <button
+              class="calendar_day"
+              type="button"
+              [class.is-outside]="isOutside(date)"
+              [class.is-selected]="isSelected(date)"
+              [class.is-today]="isToday(date)"
+              (click)="choose(date)"
+            >
+              {{ dayNumber(date) }}
+            </button>
+          }
+        </div>
+      }
+
+      <button class="calendar_today" type="button" (click)="chooseToday()">Hoy</button>
+    </div>
+  }
+</div>

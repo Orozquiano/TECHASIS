@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type {
   ApiResponse,
@@ -9,6 +9,12 @@ import type {
   Vehicle,
 } from '../../../../core/models';
 import { CardComponent } from '../../../../shared/components/card/card.component';
+import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
+import { TimeFieldComponent } from '../../../../shared/components/time-field/time-field.component';
+import {
+  SelectComponent,
+  type SelectOption,
+} from '../../../../shared/components/select/select.component';
 import { NewServiceService } from '../../services/new-service.service';
 
 /**
@@ -17,7 +23,7 @@ import { NewServiceService } from '../../services/new-service.service';
  */
 @Component({
   selector: 'app-new-service',
-  imports: [CardComponent, ReactiveFormsModule],
+  imports: [CardComponent, DateFieldComponent, ReactiveFormsModule, SelectComponent, TimeFieldComponent],
   templateUrl: './new-service.component.html',
   styleUrl: './new-service.component.scss',
 })
@@ -61,10 +67,74 @@ export class NewServiceComponent implements OnInit {
   protected readonly infoMessage = signal<string | null>(null);
 
   /**
+   * @description Teléfonos listos para el selector.
+   */
+  protected readonly telefonoOptions = computed<SelectOption[]>(() =>
+    this.telefonosLista().map((tel) => ({ value: tel.descripcion, label: tel.descripcion })),
+  );
+
+  /**
+   * @description Técnicos listos para el selector.
+   */
+  protected readonly tecnicoOptions = computed<SelectOption[]>(() => [
+    ...this.tecnicosLista().map((tec) => ({
+      value: String(tec.id),
+      label: `${tec.primerNombre} ${tec.primerApellido}`,
+    })),
+    { value: 'OTRO', label: 'OTRO' },
+  ]);
+
+  /**
+   * @description Placas de grúa listas para el selector.
+   */
+  protected readonly gruaOptions = computed<SelectOption[]>(() => [
+    ...this.gruasLista().map((grua) => ({ value: String(grua.id), label: grua.placa })),
+    { value: 'OTRO', label: 'OTRO' },
+  ]);
+
+  /**
+   * @description Estados de servicio listos para el selector.
+   */
+  protected readonly estadoOptions = computed<SelectOption[]>(() =>
+    this.estadoServicioLista().map((estado) => ({
+      value: String(estado.id),
+      label: estado.descripcion,
+    })),
+  );
+
+  /**
+   * @description Tipos de vehículo del servicio.
+   */
+  protected readonly tipoVehiculoOptions: SelectOption[] = [
+    { value: 'liviano', label: 'Liviano' },
+    { value: 'semipesado', label: 'Semipesado' },
+  ];
+
+  /**
+   * @description Operadoras disponibles cuando la aseguradora es IKE.
+   */
+  protected readonly operadoraIkeOptions: SelectOption[] = [
+    { value: 'HDI', label: 'HDI' },
+    { value: 'HDI BRANDEADA', label: 'HDI BRANDEADA' },
+    { value: 'PREVISORA', label: 'PREVISORA' },
+    { value: 'MUNDIAL', label: 'MUNDIAL' },
+    { value: 'IKE CORP', label: 'IKE CORP' },
+  ];
+
+  /**
+   * @description Estados de facturación del servicio.
+   */
+  protected readonly estadoFacturaOptions: SelectOption[] = [
+    { value: 'NO FACTURADO', label: 'NO FACTURADO' },
+    { value: 'FACTURADO', label: 'FACTURADO' },
+    { value: 'FACTURADO Y PAGADO', label: 'FACTURADO Y PAGADO' },
+  ];
+
+  /**
    * @description Formulario reactivo del nuevo servicio.
    */
   protected readonly serviceForm = this.fb.group({
-    tipoServicio: ['GRUA', Validators.required],
+    tipoServicio: ['', Validators.required],
     registroNum: [{ value: '', disabled: true }],
     nombreAsegurado: ['', Validators.required],
     placaVehiculo: ['', Validators.required],
@@ -84,7 +154,7 @@ export class NewServiceComponent implements OnInit {
     aseguradoraOtro: [''],
     operadoraIke: [''],
     ciudadDestino: ['', Validators.required],
-    tipoVehiculo: ['liviano'],
+    tipoVehiculo: [''],
     kmNormal: [0],
     kmZonaRoja: [0],
     otroConcepto: [''],
@@ -92,7 +162,7 @@ export class NewServiceComponent implements OnInit {
     tarifaTecnicoSel: [''],
     tarifaTecnicoOtro: [null as number | null],
     observaciones: [''],
-    estadoFactura: ['NO FACTURADO'],
+    estadoFactura: [''],
     numFactura: [''],
   });
 
@@ -130,11 +200,6 @@ export class NewServiceComponent implements OnInit {
     this.newServiceService.getServiceInitData().subscribe({
       next: (res) => {
         const data = res.data!;
-        const aseguradoras = data.aseguradoras;
-
-        if (aseguradoras.length > 0) {
-          this.serviceForm.patchValue({ aseguradora: aseguradoras[0].nombre });
-        }
 
         this.telefonosLista.set(data.telefonos);
         this.tecnicosLista.set(data.usuariosTecnicos);
@@ -245,15 +310,13 @@ export class NewServiceComponent implements OnInit {
    * @description Restablece el formulario a sus valores iniciales.
    */
   protected limpiarFormulario(): void {
-    const primera = this.aseguradoraLista()[0]?.nombre ?? '';
-
     this.serviceForm.reset({
-      tipoServicio: 'GRUA',
-      tipoVehiculo: 'liviano',
+      tipoServicio: '',
+      tipoVehiculo: '',
       kmNormal: 0,
       kmZonaRoja: 0,
-      estadoFactura: 'NO FACTURADO',
-      aseguradora: primera,
+      estadoFactura: '',
+      aseguradora: '',
       telefonoSel: '',
       tecnicoSel: '',
       placaGruaSel: '',

@@ -1,0 +1,37 @@
+<div class="picker" [class.is-open]="open()">
+  <button
+    #trigger
+    class="picker_trigger"
+    type="button"
+    [id]="inputId()"
+    [disabled]="disabled()"
+    [class.is-empty]="!selectedLabel()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="listbox"
+    (click)="toggle()"
+  >
+    <span class="picker_value">{{ selectedLabel() || placeholder() }}</span>
+    <svg class="picker_chevron" viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M5 7.5 10 12.5 15 7.5" />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <div #menu class="picker_menu" role="listbox" [attr.aria-labelledby]="inputId()">
+      @for (option of choices(); track option.value) {
+        <button
+          class="picker_option"
+          type="button"
+          role="option"
+          [class.is-selected]="isSelected(option.value)"
+          [attr.aria-selected]="isSelected(option.value)"
+          (click)="choose(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      } @empty {
+        <p class="picker_empty">Sin opciones</p>
+      }
+    </div>
+  }
+</div>

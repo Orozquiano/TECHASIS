@@ -261,15 +261,12 @@ export class ShellComponent {
 
   /**
    * @function stopMotion
-   * @description Cancela una animación que todavía se está ejecutando.
+   * @description Quita la animación de la página, también cuando ya terminó,
+   * para que no deje un transform que desplace los paneles fijos.
    * @param animation Animación de entrada o salida. Puede no existir.
    */
   private stopMotion(animation: Animation | null): void {
-    if (!animation || animation.playState !== 'running') {
-      return;
-    }
-
-    animation.cancel();
+    animation?.cancel();
   }
 
   /**

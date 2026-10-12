@@ -65,12 +65,12 @@
 
           <div class="form-group">
             <label for="ns-telefono">Teléfono / celular *</label>
-            <select id="ns-telefono" formControlName="telefonoSel">
-              <option value="">— Selecciona —</option>
-              @for (tel of telefonosLista(); track tel.id) {
-                <option [value]="tel.descripcion">{{ tel.descripcion }}</option>
-              }
-            </select>
+            <app-select
+              inputId="ns-telefono"
+              formControlName="telefonoSel"
+              placeholder="— Selecciona —"
+              [options]="telefonoOptions()"
+            />
             @if (serviceForm.get('telefonoSel')?.value === 'OTRO (Pegar número)') {
               <input
                 class="ns_otro"
@@ -93,25 +93,22 @@
 
           <div class="form-group">
             <label for="ns-fecha">Fecha del servicio *</label>
-            <input id="ns-fecha" type="date" formControlName="fechaServicio" />
+            <app-date-field inputId="ns-fecha" formControlName="fechaServicio" />
           </div>
 
           <div class="form-group">
             <label for="ns-hora">Hora del servicio *</label>
-            <input id="ns-hora" type="time" formControlName="horaServicio" />
+            <app-time-field inputId="ns-hora" formControlName="horaServicio" />
           </div>
 
           <div class="form-group">
             <label for="ns-tecnico">Técnico / conductor *</label>
-            <select id="ns-tecnico" formControlName="tecnicoSel">
-              <option value="">— Selecciona conductor —</option>
-              @for (tec of tecnicosLista(); track tec.id) {
-                <option [value]="tec.id">
-                  {{ tec.primerNombre }} {{ tec.primerApellido }}
-                </option>
-              }
-              <option value="OTRO">OTRO</option>
-            </select>
+            <app-select
+              inputId="ns-tecnico"
+              formControlName="tecnicoSel"
+              placeholder="— Selecciona conductor —"
+              [options]="tecnicoOptions()"
+            />
             @if (serviceForm.get('tecnicoSel')?.value === 'OTRO') {
               <input
                 class="ns_otro"
@@ -124,13 +121,12 @@
 
           <div class="form-group">
             <label for="ns-grua">Placa de la grúa *</label>
-            <select id="ns-grua" formControlName="placaGruaSel">
-              <option value="">— Selecciona placa —</option>
-              @for (grua of gruasLista(); track grua.id) {
-                <option [value]="grua.id">{{ grua.placa }}</option>
-              }
-              <option value="OTRO">OTRO</option>
-            </select>
+            <app-select
+              inputId="ns-grua"
+              formControlName="placaGruaSel"
+              placeholder="— Selecciona placa —"
+              [options]="gruaOptions()"
+            />
             @if (serviceForm.get('placaGruaSel')?.value === 'OTRO') {
               <input
                 class="ns_otro"
@@ -143,12 +139,12 @@
 
           <div class="form-group">
             <label for="ns-estado">Estado del servicio *</label>
-            <select id="ns-estado" formControlName="estadoServicioSel">
-              <option value="">— Selecciona —</option>
-              @for (est of estadoServicioLista(); track est.id) {
-                <option [value]="est.id">{{ est.descripcion }}</option>
-              }
-            </select>
+            <app-select
+              inputId="ns-estado"
+              formControlName="estadoServicioSel"
+              placeholder="— Selecciona —"
+              [options]="estadoOptions()"
+            />
           </div>
         </div>
       </app-card>
@@ -184,10 +180,12 @@
           </div>
           <div class="form-group">
             <label for="ns-tipoveh">Tipo de vehículo</label>
-            <select id="ns-tipoveh" formControlName="tipoVehiculo">
-              <option value="liviano">Liviano</option>
-              <option value="semipesado">Semipesado</option>
-            </select>
+            <app-select
+              inputId="ns-tipoveh"
+              formControlName="tipoVehiculo"
+              placeholder="— Selecciona —"
+              [options]="tipoVehiculoOptions"
+            />
           </div>
         </div>
       </app-card>
@@ -223,14 +221,12 @@
         @if (serviceForm.get('aseguradora')?.value?.toUpperCase() === 'IKE') {
           <div class="form-group">
             <label for="ns-ike">Operadora IKE *</label>
-            <select id="ns-ike" formControlName="operadoraIke">
-              <option value="">— Selecciona operadora —</option>
-              <option value="HDI">HDI</option>
-              <option value="HDI BRANDEADA">HDI BRANDEADA</option>
-              <option value="PREVISORA">PREVISORA</option>
-              <option value="MUNDIAL">MUNDIAL</option>
-              <option value="IKE CORP">IKE CORP</option>
-            </select>
+            <app-select
+              inputId="ns-ike"
+              formControlName="operadoraIke"
+              placeholder="— Selecciona operadora —"
+              [options]="operadoraIkeOptions"
+            />
           </div>
         }
       </app-card>
@@ -268,11 +264,12 @@
           </div>
           <div class="form-group">
             <label for="ns-ef">Estado de factura</label>
-            <select id="ns-ef" formControlName="estadoFactura">
-              <option value="NO FACTURADO">NO FACTURADO</option>
-              <option value="FACTURADO">FACTURADO</option>
-              <option value="FACTURADO Y PAGADO">FACTURADO Y PAGADO</option>
-            </select>
+            <app-select
+              inputId="ns-ef"
+              formControlName="estadoFactura"
+              placeholder="— Selecciona —"
+              [options]="estadoFacturaOptions"
+            />
           </div>
           <div class="form-group">
             <label for="ns-factura">Número de factura</label>

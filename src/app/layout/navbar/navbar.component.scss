@@ -33,7 +33,7 @@
   left: 0;
   z-index: 0;
   border-radius: 999px;
-  background: var(--brand-primary);
+  background: var(--brand-fill);
   pointer-events: none;
   opacity: 0;
 }
@@ -85,7 +85,7 @@
 }
 
 .navbar_items:has(.navbar_pill.is-ready) .navbar_link.is-active {
-  color: var(--brand-on-primary);
+  color: var(--brand-on-fill);
 }
 
 .tabbar,
@@ -199,7 +199,7 @@
   }
 
   .tabbar:has(.tabbar_pill.is-ready) .tabbar_item.is-active {
-    color: var(--brand-on-primary);
+    color: var(--brand-on-fill);
   }
 
   .tabbar_label {

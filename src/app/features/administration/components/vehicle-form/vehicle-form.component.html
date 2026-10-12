@@ -1,12 +1,12 @@
 <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="form-container">
   <div class="form-group">
     <label for="vehicle-tipo">Tipo de vehículo *</label>
-    <select id="vehicle-tipo" formControlName="tipoVehiculoId">
-      <option value="">Seleccione...</option>
-      @for (tipo of tiposVehiculo; track tipo.id) {
-        <option [value]="tipo.id">{{ tipo.nombre }}</option>
-      }
-    </select>
+    <app-select
+      inputId="vehicle-tipo"
+      formControlName="tipoVehiculoId"
+      placeholder="— Selecciona —"
+      [options]="tipoVehiculoOptions"
+    />
   </div>
 
   <div class="form-group">

@@ -37,6 +37,18 @@
     color: var(--placeholder);
   }
 
+  &:is(select):has(option[value='']:checked) {
+    color: var(--placeholder);
+  }
+
+  &:is(select) option {
+    color: var(--text);
+  }
+
+  &:is(select) option[value=''] {
+    color: var(--placeholder);
+  }
+
   &:focus {
     border-color: var(--brand-secondary);
     box-shadow: 0 0 0 4px var(--focus);
@@ -48,6 +60,20 @@
   min-height: 96px;
   padding: 12px 14px;
   resize: vertical;
+}
+
+.modal-body .form-container > .form-group,
+.modal-body .form-container > .form-row {
+  margin-bottom: 22px;
+}
+
+.modal-body .form-row {
+  row-gap: 22px;
+}
+
+.modal-body .form-actions {
+  margin-top: 6px;
+  margin-bottom: 0;
 }
 
 .form-row {
@@ -83,12 +109,12 @@
 }
 
 .btn-primary {
-  color: var(--brand-on-primary);
-  background: var(--brand-primary);
+  color: var(--brand-on-fill);
+  background: var(--brand-fill);
   border: 0;
 
   &:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--brand-primary) 82%, var(--brand-secondary));
+    background: color-mix(in srgb, var(--brand-fill) 86%, var(--brand-secondary));
   }
 
   &:disabled {

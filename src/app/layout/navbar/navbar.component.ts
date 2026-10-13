@@ -16,34 +16,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
+import { APP_SECTIONS, menuGrantsRoute, type AppSection } from '../../core/navigation/app-sections';
 import { PageOverlayService } from '../../shared/overlay/page-overlay.service';
 import { MenuHamburguesaComponent } from '../menu-hamburguesa/menu-hamburguesa.component';
-
-/**
- * @interface NavItem
- * @description Elemento de navegación del área autenticada.
- */
-interface NavItem {
-  /**
-   * @description Texto visible en la barra de escritorio.
-   */
-  label: string;
-
-  /**
-   * @description Texto corto para la barra inferior en pantallas estrechas.
-   */
-  tabLabel: string;
-
-  /**
-   * @description Segmento de ruta asociado al ítem.
-   */
-  route: string;
-
-  /**
-   * @description Símbolo visual usado en la barra inferior.
-   */
-  symbol: 'plus' | 'list' | 'folder' | 'check' | 'chart' | 'trend' | 'shield' | 'sliders';
-}
 
 /**
  * @class NavbarComponent
@@ -71,23 +46,14 @@ export class NavbarComponent implements OnInit {
   protected readonly pageOverlayOpen = this.pageOverlay.isOpen;
 
   /**
-   * @description Catálogo completo de rutas conocidas por la aplicación.
+   * @description Catálogo completo de secciones conocidas por la aplicación.
    */
-  private readonly allNavItems: NavItem[] = [
-    { label: 'Nuevo servicio', tabLabel: 'Nuevo', route: 'newService', symbol: 'plus' },
-    { label: 'Servicios', tabLabel: 'Servicios', route: 'services', symbol: 'list' },
-    { label: 'Expedientes', tabLabel: 'Expedientes', route: 'files', symbol: 'folder' },
-    { label: 'Conciliación', tabLabel: 'Conciliar', route: 'conciliations', symbol: 'check' },
-    { label: 'Informes', tabLabel: 'Informes', route: 'reports', symbol: 'chart' },
-    { label: 'Ranking', tabLabel: 'Ranking', route: 'ranking', symbol: 'trend' },
-    { label: 'Custodias', tabLabel: 'Custodias', route: 'wachen', symbol: 'shield' },
-    { label: 'Administración', tabLabel: 'Ajustes', route: 'administration', symbol: 'sliders' },
-  ];
+  private readonly allNavItems: readonly AppSection[] = APP_SECTIONS;
 
   /**
-   * @description Ítems visibles según permisos del usuario.
+   * @description Ítems visibles según el menú autorizado.
    */
-  protected readonly visibleNavItems = signal<NavItem[]>([]);
+  protected readonly visibleNavItems = signal<readonly AppSection[]>([]);
 
   /**
    * @description Ruta actual, usada para marcar el acceso Más.
@@ -385,16 +351,19 @@ export class NavbarComponent implements OnInit {
 
   /**
    * @function filterMenuByPermissions
-   * @description Reduce el menú a las rutas autorizadas en sesión.
+   * @description Muestra solo las secciones que el menú autoriza, identificadas por código o por nombre de ruta.
    */
   private filterMenuByPermissions(): void {
     const allowedRoutes = this.authService.getUserRoutesFromStorage();
 
+    if (allowedRoutes.length === 0) {
+      this.visibleNavItems.set(this.allNavItems);
+      return;
+    }
+
     this.visibleNavItems.set(
       this.allNavItems.filter((item) =>
-        allowedRoutes.some(
-          (allowed) => allowed.nombre.toLowerCase() === item.route.toLowerCase(),
-        ),
+        allowedRoutes.some((allowed) => menuGrantsRoute(allowed, item.route)),
       ),
     );
   }

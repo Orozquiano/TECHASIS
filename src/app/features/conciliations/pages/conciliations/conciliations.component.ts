@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 
 /**
  * @class ConciliationsComponent
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'app-conciliations',
-  imports: [],
+  imports: [PageHelpComponent],
   templateUrl: './conciliations.component.html',
 })
 export class ConciliationsComponent {}

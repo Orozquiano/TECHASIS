@@ -4,14 +4,16 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { APP_ENVIRONMENT } from '../../../../core/config/app-environment';
 import { DEMO_CREDENTIALS } from '../../../../core/http/mock-api.store';
+import { formatApiMessage } from '../../../../core/messages/app-messages';
 import type { ApiResponse } from '../../../../core/models';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 /**
  * @class LoginComponent
  * @description Pantalla inicial de acceso a la plataforma.
  */
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ModalComponent],
   selector: 'app-login',
   styleUrl: './login.component.scss',
   templateUrl: './login.component.html',
@@ -43,9 +45,14 @@ export class LoginComponent {
   protected readonly isLoading = signal(false);
 
   /**
-   * @description Mensaje de error de autenticación.
+   * @description Mensaje mostrado en el popup de error.
    */
   protected readonly errorMessage = signal<string | null>(null);
+
+  /**
+   * @description Indica si el popup de error está abierto.
+   */
+  protected readonly errorOpen = signal(false);
 
   /**
    * @description Formulario reactivo de inicio de sesión.
@@ -74,6 +81,7 @@ export class LoginComponent {
       return;
     }
 
+    this.errorOpen.set(false);
     this.errorMessage.set(null);
     this.isLoading.set(true);
 
@@ -86,15 +94,18 @@ export class LoginComponent {
       },
       error: (err: unknown) => {
         this.isLoading.set(false);
-        const apiRes = this.resolveApiError(err);
-
-        if (apiRes?.showsMessage && apiRes.message) {
-          this.errorMessage.set(apiRes.message);
-        } else {
-          this.errorMessage.set('Credenciales inválidas o error de conexión.');
-        }
+        this.errorMessage.set(formatApiMessage(this.resolveApiError(err)));
+        this.errorOpen.set(true);
       },
     });
+  }
+
+  /**
+   * @function closeError
+   * @description Cierra el popup de error de autenticación.
+   */
+  protected closeError(): void {
+    this.errorOpen.set(false);
   }
 
   /**

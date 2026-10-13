@@ -25,7 +25,14 @@ export const DEMO_CREDENTIALS = {
  */
 export function createDemoMenu(): MenuItem[] {
   return [
-    { id: 1, padreMenuId: null, nombre: 'newService', descripcion: 'Nuevo servicio', codigo: 'NS' },
+    {
+      id: 1,
+      padreMenuId: null,
+      nombre: 'newService',
+      descripcion:
+        'Permite definir tipo e información del servicio, ruta, aseguradora asociada, tarifas base y adicionales por km, recargos, valor del técnico y observaciones.',
+      codigo: '001',
+    },
     { id: 2, padreMenuId: null, nombre: 'services', descripcion: 'Servicios', codigo: 'SV' },
     { id: 3, padreMenuId: null, nombre: 'files', descripcion: 'Expedientes', codigo: 'FL' },
     {

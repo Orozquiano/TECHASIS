@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 
 /**
  * @class ServicesComponent
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'app-services',
-  imports: [],
+  imports: [PageHelpComponent],
   templateUrl: './services.component.html',
 })
 export class ServicesComponent {}

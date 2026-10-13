@@ -1,15 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { APP_ENVIRONMENT } from '../config/app-environment';
+import { routeForMenuItem, menuGrantsRoute } from '../navigation/app-sections';
 import { THEME_STORAGE_KEY } from '../theme/theme.constants';
 import type {
   AuthUserData,
   LoginRequest,
   LoginResponse,
   MenuItem,
+  User,
   UserRoutesResponse,
+  UserSingleResponse,
 } from '../models';
+import { formatPersonName } from './person-name';
 
 /**
  * @class AuthService
@@ -29,7 +33,7 @@ export class AuthService {
 
   /**
    * @function login
-   * @description Autentica al usuario, guarda la sesión y obtiene sus rutas.
+   * @description Autentica al usuario, carga su perfil y obtiene sus rutas.
    * @param credentials Credenciales de acceso.
    * @param remember Indica si la sesión debe persistir en localStorage.
    * @returns Promesa observable con la ruta por defecto y el menú permitido.
@@ -41,26 +45,40 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.env.apiUrl}/user/login`, credentials).pipe(
       switchMap((loginRes) => {
         if (!loginRes.success || !loginRes.data?.accessToken) {
-          throw loginRes;
+          return throwError(() => loginRes);
         }
 
         this.saveSession(loginRes.data, remember);
 
-        return this.getUserRoutes().pipe(
-          map((routesRes) => {
-            if (!routesRes.success || !routesRes.data) {
-              throw routesRes;
+        return this.getAuthenticatedUser(loginRes.data.usuarioId).pipe(
+          switchMap((profileRes) => {
+            if (!profileRes.success || !profileRes.data) {
+              return throwError(() => profileRes);
             }
 
-            const routes = routesRes.data;
-            const defaultRoute = routes[0]?.nombre ?? 'newService';
-            this.saveUserRoutes(routes);
-
-            return { defaultRoute, routes };
+            this.saveProfile(profileRes.data);
+            return this.getUserRoutes().pipe(
+              map((routesRes) => this.resolveDefaultRoute(routesRes)),
+              catchError(() => of({ defaultRoute: 'newService', routes: [] as MenuItem[] })),
+            );
+          }),
+          catchError((error: unknown) => {
+            this.logout();
+            return throwError(() => error);
           }),
         );
       }),
     );
+  }
+
+  /**
+   * @function getAuthenticatedUser
+   * @description Obtiene el perfil del usuario autenticado.
+   * @param usuarioId Identificador devuelto por el login.
+   * @returns Respuesta con los datos del usuario.
+   */
+  private getAuthenticatedUser(usuarioId: number): Observable<UserSingleResponse> {
+    return this.http.get<UserSingleResponse>(`${this.env.apiUrl}/user/${usuarioId}`);
   }
 
   /**
@@ -86,6 +104,26 @@ export class AuthService {
   }
 
   /**
+   * @function saveProfile
+   * @description Guarda el documento y el nombre visible del perfil autenticado.
+   * @param profile Usuario devuelto por el backend.
+   */
+  private saveProfile(profile: User): void {
+    const storage = this.activeStorage();
+    storage.setItem('user_doc', profile.documento);
+    storage.setItem('user_name', formatPersonName(profile));
+  }
+
+  /**
+   * @function activeStorage
+   * @description Elige el almacenamiento donde quedó el token de la sesión actual.
+   * @returns localStorage si la sesión es persistente; si no, sessionStorage.
+   */
+  private activeStorage(): Storage {
+    return localStorage.getItem('auth_token') ? localStorage : sessionStorage;
+  }
+
+  /**
    * @function saveUserRoutes
    * @description Guarda las rutas autorizadas en almacenamiento local.
    * @param routes Menú permitido para el usuario.
@@ -105,12 +143,50 @@ export class AuthService {
   }
 
   /**
+   * @function resolveDefaultRoute
+   * @description Guarda el menú cuando el backend lo entrega y elige la ruta inicial.
+   * @param routesRes Respuesta del menú autorizado.
+   * @returns Ruta por defecto y menú persistido, o un arreglo vacío si no llegó menú.
+   */
+  private resolveDefaultRoute(routesRes: UserRoutesResponse): {
+    defaultRoute: string;
+    routes: MenuItem[];
+  } {
+    const routes = routesRes.success && routesRes.data ? routesRes.data : [];
+
+    if (routes.length > 0) {
+      this.saveUserRoutes(routes);
+    }
+
+    const defaultRoute = routes[0] ? routeForMenuItem(routes[0]) : 'newService';
+    return { defaultRoute, routes };
+  }
+
+  /**
    * @function getToken
    * @description Obtiene el token de acceso vigente.
    * @returns Token JWT o null cuando no hay sesión.
    */
   getToken(): string | null {
     return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  }
+
+  /**
+   * @function getDocumento
+   * @description Obtiene el documento guardado al iniciar sesión.
+   * @returns Documento del usuario o null cuando no hay sesión.
+   */
+  getDocumento(): string | null {
+    return localStorage.getItem('user_doc') || sessionStorage.getItem('user_doc');
+  }
+
+  /**
+   * @function getUserName
+   * @description Obtiene el nombre visible guardado con el perfil.
+   * @returns Nombre compuesto o null cuando aún no hay perfil.
+   */
+  getUserName(): string | null {
+    return localStorage.getItem('user_name') || sessionStorage.getItem('user_name');
   }
 
   /**
@@ -133,9 +209,7 @@ export class AuthService {
       return false;
     }
 
-    return this.getUserRoutesFromStorage().some(
-      (route) => route.nombre.toLowerCase() === path.toLowerCase(),
-    );
+    return this.getUserRoutesFromStorage().some((route) => menuGrantsRoute(route, path));
   }
 
   /**

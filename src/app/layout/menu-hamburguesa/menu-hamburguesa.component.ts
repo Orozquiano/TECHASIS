@@ -25,14 +25,14 @@ export class MenuHamburguesaComponent {
   protected readonly isOpen = signal(false);
 
   /**
-   * @description Nombre visible mientras no exista el perfil real del usuario.
+   * @description Nombre visible del perfil autenticado.
    */
-  protected readonly userName = 'Gerardo Hernández';
+  protected readonly userName = this.authService.getUserName();
 
   /**
-   * @description Identificación provisional generada para esta vista.
+   * @description Documento del perfil autenticado.
    */
-  protected readonly identification = Math.floor(10000000 + Math.random() * 90000000);
+  protected readonly documento = this.authService.getDocumento();
 
   /**
    * @description Tema efectivo aplicado, expuesto para la plantilla.

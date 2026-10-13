@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 
 /**
  * @class FilesComponent
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'app-files',
-  imports: [],
+  imports: [PageHelpComponent],
   templateUrl: './files.component.html',
 })
 export class FilesComponent {}

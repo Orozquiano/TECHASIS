@@ -14,6 +14,7 @@ import type {
   VehicleInitDataParams,
 } from '../../../../core/models';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 import { InsuranceFormComponent } from '../../components/insurance-form/insurance-form.component';
 import { StatusFormComponent } from '../../components/status-form/status-form.component';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
@@ -30,6 +31,7 @@ import { VehicleService } from '../../services/vehicle.service';
 @Component({
   selector: 'app-administration',
   imports: [
+    PageHelpComponent,
     ReactiveFormsModule,
     ModalComponent,
     UserFormComponent,

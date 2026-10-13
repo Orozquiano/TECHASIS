@@ -9,6 +9,7 @@ import type {
   Vehicle,
 } from '../../../../core/models';
 import { CardComponent } from '../../../../shared/components/card/card.component';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
 import { TimeFieldComponent } from '../../../../shared/components/time-field/time-field.component';
 import {
@@ -23,7 +24,14 @@ import { NewServiceService } from '../../services/new-service.service';
  */
 @Component({
   selector: 'app-new-service',
-  imports: [CardComponent, DateFieldComponent, ReactiveFormsModule, SelectComponent, TimeFieldComponent],
+  imports: [
+    CardComponent,
+    DateFieldComponent,
+    PageHelpComponent,
+    ReactiveFormsModule,
+    SelectComponent,
+    TimeFieldComponent,
+  ],
   templateUrl: './new-service.component.html',
   styleUrl: './new-service.component.scss',
 })

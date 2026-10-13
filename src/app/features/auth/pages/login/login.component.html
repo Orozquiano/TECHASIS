@@ -32,10 +32,6 @@
         </div>
       }
 
-      @if (errorMessage()) {
-        <div class="login_error" role="alert">{{ errorMessage() }}</div>
-      }
-
       <div class="field">
         <label class="field_label" for="login-user">Usuario</label>
         <input
@@ -105,3 +101,8 @@
     </form>
   </section>
 </main>
+
+<app-modal [isOpen]="errorOpen()" title="No se pudo iniciar sesión" (closed)="closeError()">
+  <p class="login_alert" role="alert">{{ errorMessage() }}</p>
+  <button class="login_alert-action" type="button" (click)="closeError()">Entendido</button>
+</app-modal>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 
 /**
  * @class RankingComponent
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'app-ranking',
-  imports: [],
+  imports: [PageHelpComponent],
   templateUrl: './ranking.component.html',
 })
 export class RankingComponent {}

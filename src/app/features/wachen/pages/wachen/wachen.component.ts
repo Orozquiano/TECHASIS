@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
 
 /**
  * @class WachenComponent
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'app-wachen',
-  imports: [],
+  imports: [PageHelpComponent],
   templateUrl: './wachen.component.html',
 })
 export class WachenComponent {}

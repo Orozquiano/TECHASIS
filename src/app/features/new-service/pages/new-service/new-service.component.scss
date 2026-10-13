@@ -44,6 +44,20 @@
   gap: 8px;
 }
 
+.ns_tipo-select {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .ns_tipo-pills {
+    display: none;
+  }
+
+  .ns_tipo-select {
+    display: block;
+  }
+}
+
 .ns_pill {
   min-height: var(--touch);
   padding: 0 16px;

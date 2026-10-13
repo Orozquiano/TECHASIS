@@ -16,7 +16,7 @@
   <form [formGroup]="serviceForm" class="ns_grid" (ngSubmit)="guardarServicio()">
     <div class="ns_main">
       <app-card title="Tipo de servicio" [required]="true">
-        <div class="ns_pills" role="listbox" aria-label="Tipo de servicio">
+        <div class="ns_tipo-pills ns_pills" role="listbox" aria-label="Tipo de servicio">
           @for (tipo of tiposServicio; track tipo.value) {
             <button
               type="button"
@@ -27,6 +27,14 @@
               {{ tipo.label }}
             </button>
           }
+        </div>
+        <div class="ns_tipo-select">
+          <app-select
+            inputId="ns-tipo"
+            formControlName="tipoServicio"
+            placeholder="— Selecciona —"
+            [options]="tiposServicio"
+          />
         </div>
       </app-card>
 

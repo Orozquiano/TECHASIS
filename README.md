@@ -30,6 +30,28 @@ Ese comando instala lo declarado en `package.json`:
 - Angular CLI 22.2.2 y el builder de la aplicación
 - TypeScript 6, Prettier, Vitest y jsdom, solo para desarrollo y pruebas
 
+## Graphify (opcional)
+
+No hace falta para correr la aplicación. Genera un grafo local del código en `graphify-out/` (esa carpeta no se versiona) para consultar archivos y dependencias antes de cambiar el proyecto.
+
+El paquete se llama `graphifyy` y el comando es `graphify`. Con [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv tool install graphifyy
+```
+
+En la raíz del repositorio, crea o actualiza el grafo después de un cambio:
+
+```bash
+graphify update .
+```
+
+Para que Cursor use ese grafo en este proyecto:
+
+```bash
+graphify cursor install
+```
+
 ## Cómo correrlo
 
 La aplicación queda en [http://localhost:4200/](http://localhost:4200/). Al entrar pide inicio de sesión. La ruta autenticada por defecto es `/newService`.

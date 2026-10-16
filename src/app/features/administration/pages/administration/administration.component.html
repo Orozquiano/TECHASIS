@@ -158,6 +158,90 @@
       </div>
     </div>
   </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('types')">
+        <span class="admin_chevron" [class.is-open]="isTypesOpen()" aria-hidden="true"></span>
+        <h2>Tipos de vehículo</h2>
+      </button>
+      <button class="btn-primary" type="button" (click)="openTypeModal()">Crear</button>
+    </header>
+    <div class="admin_panel" [class.is-open]="isTypesOpen()">
+      <div class="admin_panel_inner">
+        <div class="admin_grid">
+          @for (item of vehicleTypes(); track item.id) {
+            <article class="admin_item">
+              <div class="admin_item-info">
+                <strong>{{ item.nombre }}</strong>
+                <small>Cod: {{ item.codigo }} · {{ item.carga ? 'Carga' : 'Sin carga' }}</small>
+              </div>
+              <div class="admin_item-actions">
+                <button type="button" (click)="openTypeModal(item.id)">Editar</button>
+                <button type="button" class="is-danger" (click)="deleteVehicleType(item.id)">Eliminar</button>
+              </div>
+            </article>
+          } @empty {
+            <p class="admin_empty">No hay tipos de vehículo registrados.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('rates')">
+        <span class="admin_chevron" [class.is-open]="isRatesOpen()" aria-hidden="true"></span>
+        <h2>Tarifas base</h2>
+      </button>
+      <button class="btn-primary" type="button" (click)="openRateModal()">Crear</button>
+    </header>
+    <div class="admin_panel" [class.is-open]="isRatesOpen()">
+      <div class="admin_panel_inner">
+        <p class="admin_empty">Listado, consulta y eliminación: contrato pendiente. Aquí solo aparecen las tarifas creadas o actualizadas en esta sesión.</p>
+        <div class="admin_grid">
+          @for (item of createdRates(); track item.id) {
+            <article class="admin_item">
+              <div class="admin_item-info">
+                <strong>{{ item.descripcion }}</strong>
+                <small>{{ item.aseguradora.nombre }} · {{ item.valor }} · {{ item.codigo }}</small>
+              </div>
+              <div class="admin_item-actions">
+                <button type="button" (click)="openRateModal(item.id)">Editar</button>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="admin_section">
+    <header class="admin_section-header">
+      <button class="admin_toggle" type="button" (click)="toggleSection('menus')">
+        <span class="admin_chevron" [class.is-open]="isMenusOpen()" aria-hidden="true"></span>
+        <h2>Menú</h2>
+      </button>
+    </header>
+    <div class="admin_panel" [class.is-open]="isMenusOpen()">
+      <div class="admin_panel_inner">
+        <p class="admin_empty">Actualizar, eliminar y parámetros de menú: contrato pendiente. La colección apunta esas operaciones a rutas de usuarios.</p>
+        <div class="admin_grid">
+          @for (item of menus(); track item.id) {
+            <article class="admin_item">
+              <div class="admin_item-info">
+                <strong>{{ item.descripcion }}</strong>
+                <small>{{ item.nombre }} · {{ item.codigo }}</small>
+              </div>
+            </article>
+          } @empty {
+            <p class="admin_empty">No hay ítems de menú.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
 </section>
 
 <app-modal
@@ -174,6 +258,7 @@
       [roles]="userParams().roles"
       (save)="saveUser($event)"
       (cancel)="closeUserModal()"
+      [pending]="saving()"
     />
   }
 </app-modal>
@@ -191,6 +276,7 @@
       [tiposVehiculo]="vehicleParams().tiposVehiculo"
       (save)="saveVehicle($event)"
       (cancel)="closeVehicleModal()"
+      [pending]="saving()"
     />
   }
 </app-modal>
@@ -207,6 +293,7 @@
       [insurance]="selectedInsurance()"
       (save)="saveInsurance($event)"
       (cancel)="closeInsuranceModal()"
+      [pending]="saving()"
     />
   }
 </app-modal>
@@ -223,6 +310,38 @@
       [status]="selectedStatus()"
       (save)="saveStatus($event)"
       (cancel)="closeStatusModal()"
+      [pending]="saving()"
     />
   }
+</app-modal>
+
+@if (actionError()) {
+  <p class="admin_empty" role="alert">{{ actionError() }}</p>
+}
+
+<app-modal
+  [isOpen]="isTypeModalOpen()"
+  [title]="selectedType() ? 'Editar tipo de vehículo' : 'Crear tipo de vehículo'"
+  (closed)="closeTypeModal()"
+>
+  <app-vehicle-type-form
+    [vehicleType]="selectedType()"
+    [pending]="saving()"
+    (save)="saveVehicleType($event)"
+    (cancel)="closeTypeModal()"
+  />
+</app-modal>
+
+<app-modal
+  [isOpen]="isRateModalOpen()"
+  [title]="editingRateId() ? 'Editar tarifa base' : 'Crear tarifa base'"
+  (closed)="closeRateModal()"
+>
+  <app-base-rate-form
+    [insurers]="rateInsurers()"
+    [rateId]="editingRateId()"
+    [pending]="saving()"
+    (save)="saveBaseRate($event)"
+    (cancel)="closeRateModal()"
+  />
 </app-modal>

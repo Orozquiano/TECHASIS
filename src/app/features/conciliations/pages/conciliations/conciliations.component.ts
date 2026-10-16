@@ -16,6 +16,7 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
   selector: 'app-conciliations',
   imports: [PageHelpComponent],
   templateUrl: './conciliations.component.html',
+  styleUrl: './conciliations.component.scss',
 })
 export class ConciliationsComponent {
   private readonly catalog = inject(OperationCatalogService);
@@ -51,6 +52,11 @@ export class ConciliationsComponent {
   protected readonly confirming = signal(false);
 
   /**
+   * @description true mientras un archivo se arrastra sobre la zona de carga.
+   */
+  protected readonly dragging = signal(false);
+
+  /**
    * @description Evita procesar dos veces el mismo archivo.
    */
   protected readonly busy = signal(false);
@@ -62,12 +68,57 @@ export class ConciliationsComponent {
 
   /**
    * @function onFile
-   * @description Lee un CSV o TXT y lo valida antes de cruzarlo.
+   * @description Lee el archivo elegido desde el selector.
    * @param event Cambio del input de archivo.
    */
   protected onFile(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const input = event.target instanceof HTMLInputElement ? event.target : null;
+    this.readFile(input?.files?.[0], input ?? undefined);
+  }
+
+  /**
+   * @function onDragOver
+   * @description Permite soltar el archivo sobre la zona de carga.
+   * @param event Evento de arrastre.
+   */
+  protected onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(true);
+  }
+
+  /**
+   * @function onDragLeave
+   * @description Quita el estado de arrastre al salir de la zona.
+   * @param event Evento de arrastre.
+   */
+  protected onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    const next = event.relatedTarget;
+    const current = event.currentTarget;
+    if (next instanceof Node && current instanceof Node && current.contains(next)) {
+      return;
+    }
+    this.dragging.set(false);
+  }
+
+  /**
+   * @function onDrop
+   * @description Lee el archivo soltado sobre la zona de carga.
+   * @param event Evento de soltar.
+   */
+  protected onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(false);
+    this.readFile(event.dataTransfer?.files?.[0]);
+  }
+
+  /**
+   * @function readFile
+   * @description Valida un CSV o TXT y prepara el cruce antes de asignar.
+   * @param file Archivo elegido. Puede no existir.
+   * @param input Control de archivo, para vaciarlo si el formato no es válido.
+   */
+  private readFile(file: File | undefined, input?: HTMLInputElement): void {
     this.errorMessage.set(null);
     this.infoMessage.set(null);
     this.confirming.set(false);
@@ -81,7 +132,10 @@ export class ConciliationsComponent {
     const extension = file.name.split('.').pop()?.toLowerCase();
     if (extension !== 'csv' && extension !== 'txt') {
       this.errorMessage.set('El archivo debe ser .csv o .txt.');
-      input.value = '';
+      this.fileName.set('');
+      if (input) {
+        input.value = '';
+      }
       return;
     }
 

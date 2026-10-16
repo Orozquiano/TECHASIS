@@ -1,4 +1,5 @@
 import type {
+  BaseRate,
   Insurance,
   MenuItem,
   ServiceStatus,
@@ -28,29 +29,75 @@ export function createDemoMenu(): MenuItem[] {
     {
       id: 1,
       padreMenuId: null,
+      menuPadre: null,
       nombre: 'newService',
       descripcion:
         'Permite definir tipo e información del servicio, ruta, aseguradora asociada, tarifas base y adicionales por km, recargos, valor del técnico y observaciones.',
       codigo: '001',
+      activo: true,
     },
-    { id: 2, padreMenuId: null, nombre: 'services', descripcion: 'Servicios', codigo: 'SV' },
-    { id: 3, padreMenuId: null, nombre: 'files', descripcion: 'Expedientes', codigo: 'FL' },
+    {
+      id: 2,
+      padreMenuId: null,
+      menuPadre: null,
+      nombre: 'services',
+      descripcion: 'Servicios',
+      codigo: '002',
+      activo: true,
+    },
+    {
+      id: 3,
+      padreMenuId: null,
+      menuPadre: null,
+      nombre: 'files',
+      descripcion: 'Expedientes',
+      codigo: '003',
+      activo: true,
+    },
     {
       id: 4,
       padreMenuId: null,
-      nombre: 'conciliations',
+      menuPadre: null,
+      nombre: 'conciliation',
       descripcion: 'Conciliación',
-      codigo: 'CN',
+      codigo: '004',
+      activo: true,
     },
-    { id: 5, padreMenuId: null, nombre: 'reports', descripcion: 'Informes', codigo: 'RP' },
-    { id: 6, padreMenuId: null, nombre: 'ranking', descripcion: 'Ranking', codigo: 'RK' },
-    { id: 7, padreMenuId: null, nombre: 'wachen', descripcion: 'Custodias', codigo: 'WC' },
+    {
+      id: 5,
+      padreMenuId: null,
+      menuPadre: null,
+      nombre: 'reports',
+      descripcion: 'Informes',
+      codigo: '005',
+      activo: true,
+    },
+    {
+      id: 6,
+      padreMenuId: null,
+      menuPadre: null,
+      nombre: 'ranking',
+      descripcion: 'Ranking',
+      codigo: '006',
+      activo: true,
+    },
+    {
+      id: 7,
+      padreMenuId: null,
+      menuPadre: null,
+      nombre: 'wachen',
+      descripcion: 'Custodias',
+      codigo: '007',
+      activo: true,
+    },
     {
       id: 8,
       padreMenuId: null,
+      menuPadre: null,
       nombre: 'administration',
       descripcion: 'Administración',
-      codigo: 'AD',
+      codigo: '008',
+      activo: true,
     },
   ];
 }
@@ -77,17 +124,16 @@ export class MockApiStore {
    * @description Roles simulados.
    */
   readonly roles: Rol[] = [
-    { id: 1, nombre: 'Administrador', codigo: 'ADMIN' },
-    { id: 2, nombre: 'Técnico', codigo: 'TEC' },
-    { id: 3, nombre: 'Operador', codigo: 'OP' },
+    { id: 1, nombre: 'ADMIN', codigo: '001' },
+    { id: 2, nombre: 'TÉCNICO/CONDUCTOR', codigo: '002' },
   ];
 
   /**
-   * @description Tipos de vehículo simulados.
+   * @description Tipos de vehículo simulados, con los campos del contrato real.
    */
-  readonly tiposVehiculo: TipoVehiculo[] = [
-    { id: 1, nombre: 'Grúa', codigo: 'GRU' },
-    { id: 2, nombre: 'Carro taller', codigo: 'CT' },
+  tiposVehiculo: TipoVehiculo[] = [
+    { id: 7, nombre: 'GRÚA', codigo: '007', activo: true, carga: false },
+    { id: 1, nombre: 'AUTOMÓVIL', codigo: '001', activo: true, carga: false },
   ];
 
   /**
@@ -176,6 +222,21 @@ export class MockApiStore {
     { id: 2, descripcion: 'Finalizado', codigo: 'FN', activo: true },
     { id: 3, descripcion: 'Cancelado', codigo: 'CA', activo: true },
   ];
+
+  /**
+   * @description Tarifas base creadas durante la simulación.
+   */
+  baseRates: BaseRate[] = [];
+
+  /**
+   * @description Menú mutable de la simulación.
+   */
+  menus: MenuItem[] = createDemoMenu();
+
+  /**
+   * @description Cuando es true, los parámetros del servicio responden 409.
+   */
+  serviceParamsConflict = false;
 
   /**
    * @function next

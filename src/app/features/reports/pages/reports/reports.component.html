@@ -34,41 +34,29 @@
     </div>
 
     <div class="ops_filters">
-      <div class="form-group"><label for="rp-desde">Desde</label><input id="rp-desde" type="date" [value]="desde()" (input)="setText('desde', $event)" /></div>
-      <div class="form-group"><label for="rp-hasta">Hasta</label><input id="rp-hasta" type="date" [value]="hasta()" (input)="setText('hasta', $event)" /></div>
+      <div class="form-group">
+        <label for="rp-desde">Desde</label>
+        <app-date-field inputId="rp-desde" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+      </div>
+      <div class="form-group">
+        <label for="rp-hasta">Hasta</label>
+        <app-date-field inputId="rp-hasta" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+      </div>
       <div class="form-group">
         <label for="rp-aseg">Aseguradora</label>
-        <select id="rp-aseg" [value]="aseguradora()" (change)="setSelect('aseguradora', $event)">
-          <option value="">Todas</option>
-          @for (item of insurers(); track item) { <option [value]="item">{{ item }}</option> }
-        </select>
+        <app-select inputId="rp-aseg" placeholder="Todas" [options]="insurerOptions()" [ngModel]="aseguradora()" (ngModelChange)="aseguradora.set($event)" />
       </div>
       <div class="form-group">
         <label for="rp-tec">Técnico</label>
-        <select id="rp-tec" [value]="tecnicoId()" (change)="setSelect('tecnicoId', $event)">
-          <option value="">Todos</option>
-          @for (item of technicians(); track item.id) { <option [value]="item.id">{{ item.nombre }}</option> }
-        </select>
+        <app-select inputId="rp-tec" placeholder="Todos" [options]="technicianOptions()" [ngModel]="tecnicoId()" (ngModelChange)="tecnicoId.set($event)" />
       </div>
       <div class="form-group">
         <label for="rp-est">Estado</label>
-        <select id="rp-est" [value]="estado()" (change)="setSelect('estado', $event)">
-          <option value="">Todos</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="programado">Programado</option>
-          <option value="en_proceso">En proceso</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
+        <app-select inputId="rp-est" placeholder="Todos" [options]="statusOptions" [ngModel]="estado()" (ngModelChange)="estado.set($event)" />
       </div>
       <div class="form-group">
         <label for="rp-fac">Facturación</label>
-        <select id="rp-fac" [value]="estadoFactura()" (change)="setSelect('estadoFactura', $event)">
-          <option value="">Todos</option>
-          <option value="NO FACTURADO">No facturado</option>
-          <option value="FACTURADO">Facturado</option>
-          <option value="FACTURADO Y PAGADO">Facturado y pagado</option>
-        </select>
+        <app-select inputId="rp-fac" placeholder="Todos" [options]="billingOptions" [ngModel]="estadoFactura()" (ngModelChange)="estadoFactura.set($event)" />
       </div>
       <div class="form-group"><label for="rp-reg">Servicio</label><input id="rp-reg" [value]="registro()" (input)="setText('registro', $event)" /></div>
       <div class="form-group"><label for="rp-aut">Autorización</label><input id="rp-aut" [value]="autorizacion()" (input)="setText('autorizacion', $event)" /></div>

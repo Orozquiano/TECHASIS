@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, throwError } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../../core/config/app-environment';
+import { ContractPendingError } from '../../../core/http/api-error';
 import type { ServiceInitData } from '../../../core/models';
 
 /**
@@ -28,6 +29,20 @@ export class NewServiceService {
           }
           return res;
         }),
-      );
+    );
+  }
+
+  /**
+   * @function saveService
+   * @description Reserva el guardado del servicio. La colección no documenta esa operación.
+   * @returns Error de contrato pendiente, sin petición HTTP.
+   */
+  saveService(): Observable<never> {
+    return throwError(
+      () =>
+        new ContractPendingError(
+          'Contrato pendiente: no existe un endpoint documentado para crear el servicio. No se envió ninguna petición.',
+        ),
+    );
   }
 }

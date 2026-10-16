@@ -6,3 +6,5 @@ export * from './insurance.model';
 export * from './service-status.model';
 export * from './new-service.model';
 export * from './operation.model';
+export * from './menu.model';
+export * from './base-rate.model';

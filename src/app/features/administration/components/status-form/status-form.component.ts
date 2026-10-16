@@ -28,6 +28,8 @@ export class StatusFormComponent implements OnChanges {
    */
   @Input() status: ServiceStatus | null = null;
 
+  @Input() pending = false;
+
   /**
    * @description Emite el DTO listo para persistir.
    */

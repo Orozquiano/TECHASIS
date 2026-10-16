@@ -8,7 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import type { Insurance, SaveInsuranceDTO } from '../../../../core/models';
+import type { CreateInsuranceDTO, Insurance, UpdateInsuranceDTO } from '../../../../core/models';
 
 /**
  * @class InsuranceFormComponent
@@ -24,7 +24,8 @@ export class InsuranceFormComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input() insurance: Insurance | null = null;
-  @Output() save = new EventEmitter<SaveInsuranceDTO>();
+  @Input() pending = false;
+  @Output() save = new EventEmitter<CreateInsuranceDTO | UpdateInsuranceDTO>();
   @Output() cancel = new EventEmitter<void>();
 
   protected readonly insuranceForm = this.fb.group({
@@ -64,6 +65,18 @@ export class InsuranceFormComponent implements OnChanges {
       return;
     }
 
-    this.save.emit(this.insuranceForm.getRawValue() as SaveInsuranceDTO);
+    const nombre = this.insuranceForm.controls.nombre.value ?? '';
+    const codigo = this.insuranceForm.controls.codigo.value ?? '';
+
+    if (this.insurance) {
+      this.save.emit({
+        nombre,
+        codigo,
+        activo: this.insuranceForm.controls.activo.value ?? false,
+      });
+      return;
+    }
+
+    this.save.emit({ nombre, codigo });
   }
 }

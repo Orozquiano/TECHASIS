@@ -7,6 +7,9 @@
 
   @if (errorMessage()) {
     <div class="error-banner" role="alert">{{ errorMessage() }}</div>
+    @if (!catalogsReady()) {
+      <button class="btn-secondary" type="button" (click)="cargarDatosIniciales()">Reintentar</button>
+    }
   }
 
   @if (infoMessage()) {
@@ -296,7 +299,7 @@
         <p class="ns_aside-copy">
           Revisa los datos obligatorios y guarda el servicio cuando estén listos.
         </p>
-        <button class="btn-primary ns_full-btn" type="submit" [disabled]="saving()">Guardar servicio</button>
+        <button class="btn-primary ns_full-btn" type="submit" [disabled]="saving() || !catalogsReady()">Guardar servicio</button>
         <button class="btn-secondary ns_full-btn" type="button" (click)="limpiarFormulario()">
           Limpiar formulario
         </button>

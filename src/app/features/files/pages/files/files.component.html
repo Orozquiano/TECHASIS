@@ -22,21 +22,11 @@
       </div>
       <div class="form-group">
         <label for="fl-estado">Estado</label>
-        <select id="fl-estado" [value]="status()" (change)="onStatus($event)">
-          <option value="">Todos</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="cancelado">Cancelado</option>
-          <option value="programado">Programado</option>
-        </select>
+        <app-select inputId="fl-estado" placeholder="Todos" [options]="statusOptions" [ngModel]="status()" (ngModelChange)="status.set($event)" />
       </div>
       <div class="form-group">
         <label for="fl-fac">Facturación</label>
-        <select id="fl-fac" [value]="billing()" (change)="onBilling($event)">
-          <option value="">Todos</option>
-          <option value="NO FACTURADO">No facturado</option>
-          <option value="FACTURADO">Facturado</option>
-          <option value="FACTURADO Y PAGADO">Facturado y pagado</option>
-        </select>
+        <app-select inputId="fl-fac" placeholder="Todos" [options]="billingOptions" [ngModel]="billing()" (ngModelChange)="billing.set($event)" />
       </div>
     </div>
 

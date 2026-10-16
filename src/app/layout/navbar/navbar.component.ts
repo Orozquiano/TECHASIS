@@ -357,7 +357,7 @@ export class NavbarComponent implements OnInit {
     const allowedRoutes = this.authService.getUserRoutesFromStorage();
 
     if (allowedRoutes.length === 0) {
-      this.visibleNavItems.set(this.allNavItems);
+      this.visibleNavItems.set([]);
       return;
     }
 

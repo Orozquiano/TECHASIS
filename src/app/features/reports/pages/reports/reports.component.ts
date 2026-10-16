@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
 import {
   buildReport,
@@ -8,6 +9,8 @@ import {
   formatDateLabel,
 } from '../../../../core/operations/operation.logic';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class ReportsComponent
@@ -15,7 +18,7 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
  */
 @Component({
   selector: 'app-reports',
-  imports: [PageHelpComponent],
+  imports: [FormsModule, PageHelpComponent, DateFieldComponent, SelectComponent],
   templateUrl: './reports.component.html',
 })
 export class ReportsComponent implements OnInit {
@@ -74,6 +77,40 @@ export class ReportsComponent implements OnInit {
     }
     return [...names.entries()].map(([id, nombre]) => ({ id, nombre }));
   });
+
+  /**
+   * @description Opciones de aseguradora para el selector.
+   */
+  protected readonly insurerOptions = computed<SelectOption[]>(() =>
+    this.insurers().map((item) => ({ value: item, label: item })),
+  );
+
+  /**
+   * @description Opciones de técnico para el selector.
+   */
+  protected readonly technicianOptions = computed<SelectOption[]>(() =>
+    this.technicians().map((item) => ({ value: String(item.id), label: item.nombre })),
+  );
+
+  /**
+   * @description Estados operativos filtrables.
+   */
+  protected readonly statusOptions: SelectOption[] = [
+    { value: 'pendiente', label: 'Pendiente' },
+    { value: 'programado', label: 'Programado' },
+    { value: 'en_proceso', label: 'En proceso' },
+    { value: 'finalizado', label: 'Finalizado' },
+    { value: 'cancelado', label: 'Cancelado' },
+  ];
+
+  /**
+   * @description Estados de facturación filtrables.
+   */
+  protected readonly billingOptions: SelectOption[] = [
+    { value: 'NO FACTURADO', label: 'No facturado' },
+    { value: 'FACTURADO', label: 'Facturado' },
+    { value: 'FACTURADO Y PAGADO', label: 'Facturado y pagado' },
+  ];
 
   /**
    * @description Informe calculado con los filtros actuales.
@@ -152,24 +189,8 @@ export class ReportsComponent implements OnInit {
    * @param field Campo del filtro.
    * @param event Evento del input.
    */
-  protected setText(
-    field: 'desde' | 'hasta' | 'registro' | 'autorizacion' | 'factura',
-    event: Event,
-  ): void {
+  protected setText(field: 'registro' | 'autorizacion' | 'factura', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
-  }
-
-  /**
-   * @function setSelect
-   * @description Escribe un filtro de lista.
-   * @param field Campo del filtro.
-   * @param event Evento del selector.
-   */
-  protected setSelect(
-    field: 'aseguradora' | 'tecnicoId' | 'estado' | 'estadoFactura',
-    event: Event,
-  ): void {
-    this[field].set((event.target as HTMLSelectElement).value);
   }
 }
 

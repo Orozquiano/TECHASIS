@@ -21,7 +21,11 @@ export const authGuard: CanActivateFn = (route) => {
 
   const allowedRoutes = authService.getUserRoutesFromStorage();
 
-  if (allowedRoutes.length === 0 || authService.hasPermissionForRoute(targetPath)) {
+  if (allowedRoutes.length === 0) {
+    return router.parseUrl('/login');
+  }
+
+  if (authService.hasPermissionForRoute(targetPath)) {
     return true;
   }
 

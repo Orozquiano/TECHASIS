@@ -1,7 +1,10 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
 import { buildRanking, formatCop } from '../../../../core/operations/operation.logic';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class RankingComponent
@@ -9,7 +12,7 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
  */
 @Component({
   selector: 'app-ranking',
-  imports: [PageHelpComponent],
+  imports: [FormsModule, PageHelpComponent, DateFieldComponent, SelectComponent],
   templateUrl: './ranking.component.html',
 })
 export class RankingComponent implements OnInit {
@@ -66,6 +69,29 @@ export class RankingComponent implements OnInit {
   protected readonly types = computed(() => [...new Set(this.catalog.services().map((item) => item.tipoServicio))]);
 
   /**
+   * @description Opciones de aseguradora para el selector.
+   */
+  protected readonly insurerOptions = computed<SelectOption[]>(() =>
+    this.insurers().map((item) => ({ value: item, label: item })),
+  );
+
+  /**
+   * @description Opciones de tipo de servicio para el selector.
+   */
+  protected readonly typeOptions = computed<SelectOption[]>(() =>
+    this.types().map((item) => ({ value: item, label: item })),
+  );
+
+  /**
+   * @description Estados filtrables del ranking.
+   */
+  protected readonly statusOptions: SelectOption[] = [
+    { value: 'finalizado', label: 'Finalizado' },
+    { value: 'pendiente', label: 'Pendiente' },
+    { value: 'cancelado', label: 'Cancelado' },
+  ];
+
+  /**
    * @description Ranking del periodo, de mayor dinero registrado a menor.
    */
   protected readonly rows = computed(() => {
@@ -109,25 +135,5 @@ export class RankingComponent implements OnInit {
    */
   protected money(value: number): string {
     return formatCop(value);
-  }
-
-  /**
-   * @function onDate
-   * @description Actualiza un límite del periodo.
-   * @param field Límite que cambia.
-   * @param event Evento del campo.
-   */
-  protected onDate(field: 'desde' | 'hasta', event: Event): void {
-    this[field].set((event.target as HTMLInputElement).value);
-  }
-
-  /**
-   * @function onSelect
-   * @description Actualiza un filtro de lista.
-   * @param field Filtro que cambia.
-   * @param event Evento del selector.
-   */
-  protected onSelect(field: 'aseguradora' | 'tipo' | 'estado', event: Event): void {
-    this[field].set((event.target as HTMLSelectElement).value);
   }
 }

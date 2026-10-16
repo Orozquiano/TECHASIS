@@ -49,20 +49,20 @@ export interface AppSection {
  */
 export const APP_SECTIONS: readonly AppSection[] = [
   { codigo: '001', route: 'newService', label: 'Nuevo servicio', tabLabel: 'Nuevo', symbol: 'plus' },
-  { codigo: null, route: 'services', label: 'Servicios', tabLabel: 'Servicios', symbol: 'list' },
-  { codigo: null, route: 'files', label: 'Expedientes', tabLabel: 'Expedientes', symbol: 'folder' },
+  { codigo: '002', route: 'services', label: 'Servicios', tabLabel: 'Servicios', symbol: 'list' },
+  { codigo: '003', route: 'files', label: 'Expedientes', tabLabel: 'Expedientes', symbol: 'folder' },
   {
-    codigo: null,
+    codigo: '004',
     route: 'conciliations',
     label: 'Conciliación',
     tabLabel: 'Conciliar',
     symbol: 'check',
   },
-  { codigo: null, route: 'reports', label: 'Informes', tabLabel: 'Informes', symbol: 'chart' },
-  { codigo: null, route: 'ranking', label: 'Ranking', tabLabel: 'Ranking', symbol: 'trend' },
-  { codigo: null, route: 'wachen', label: 'Custodias', tabLabel: 'Custodias', symbol: 'shield' },
+  { codigo: '005', route: 'reports', label: 'Informes', tabLabel: 'Informes', symbol: 'chart' },
+  { codigo: '006', route: 'ranking', label: 'Ranking', tabLabel: 'Ranking', symbol: 'trend' },
+  { codigo: '007', route: 'wachen', label: 'Custodias', tabLabel: 'Custodias', symbol: 'shield' },
   {
-    codigo: null,
+    codigo: '008',
     route: 'administration',
     label: 'Administración',
     tabLabel: 'Ajustes',

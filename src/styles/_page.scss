@@ -134,9 +134,12 @@
   align-items: start;
 }
 
-.ops_actions button,
-.ops_filters button,
-.ops_panel button,
+.ops_actions > button,
+.ops_panel > button,
+.ops_panel .btn-primary,
+.ops_panel .btn-secondary,
+.ops_panel .picker_trigger,
+.ops_filters .picker_trigger,
 .ops_panel select,
 .ops_panel input:not([type='checkbox']),
 .ops_panel textarea {

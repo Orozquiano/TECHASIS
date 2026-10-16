@@ -1,7 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type {
-  ApiResponse,
   Insurance,
   ServiceStatus,
   Telefono,
@@ -16,7 +15,8 @@ import {
   SelectComponent,
   type SelectOption,
 } from '../../../../shared/components/select/select.component';
-import type { ServiceLifecycle } from '../../../../core/models';
+import { APP_ENVIRONMENT } from '../../../../core/config/app-environment';
+import { messageFromHttpError } from '../../../../core/http/api-error';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
 import {
   SERVICE_STATUS_LABEL,
@@ -46,6 +46,11 @@ export class NewServiceComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly newServiceService = inject(NewServiceService);
   private readonly catalog = inject(OperationCatalogService);
+
+  /**
+   * @description El listado reciente no tiene endpoint. En demo se muestran datos locales.
+   */
+  protected readonly contractPending = !inject(APP_ENVIRONMENT).useMockApi;
 
   /**
    * @description Catálogo de teléfonos disponibles.
@@ -90,7 +95,7 @@ export class NewServiceComponent implements OnInit {
   /**
    * @description true cuando la creación de servicios no tiene endpoint.
    */
-  protected readonly contractPending = this.catalog.contractPending;
+  protected readonly catalogsReady = signal(false);
 
   /**
    * @description Últimos servicios de la vista, del más reciente al más antiguo.
@@ -233,48 +238,39 @@ export class NewServiceComponent implements OnInit {
    * @function cargarDatosIniciales
    * @description Obtiene parámetros administrativos del backend.
    */
-  private cargarDatosIniciales(): void {
+  protected cargarDatosIniciales(): void {
     this.errorMessage.set(null);
 
     this.newServiceService.getServiceInitData().subscribe({
       next: (res) => {
-        const data = res.data!;
+        const data = res.data;
+        if (
+          !data ||
+          data.telefonos.length === 0 ||
+          data.usuariosTecnicos.length === 0 ||
+          data.gruas.length === 0 ||
+          data.estadosServicio.length === 0 ||
+          data.aseguradoras.length === 0
+        ) {
+          this.catalogsReady.set(false);
+          this.errorMessage.set('Faltan parámetros indispensables para registrar el servicio.');
+          return;
+        }
 
         this.telefonosLista.set(data.telefonos);
         this.tecnicosLista.set(data.usuariosTecnicos);
         this.gruasLista.set(data.gruas);
         this.estadoServicioLista.set(data.estadosServicio);
         this.aseguradoraLista.set(data.aseguradoras);
+        this.catalogsReady.set(true);
       },
       error: (err: unknown) => {
-        const apiRes = this.resolveApiError(err);
-
-        if (apiRes?.showsMessage && apiRes.message) {
-          this.errorMessage.set(apiRes.message);
-        } else {
-          this.errorMessage.set('No se pudieron cargar los parámetros iniciales del servicio.');
-        }
+        this.catalogsReady.set(false);
+        this.errorMessage.set(
+          messageFromHttpError(err, 'No se pudieron cargar los parámetros iniciales del servicio.'),
+        );
       },
     });
-  }
-
-  /**
-   * @function resolveApiError
-   * @description Normaliza errores HTTP o ApiResponse hacia un contrato común.
-   * @param err Error capturado por la suscripción.
-   * @returns Respuesta tipada o null cuando no se puede interpretar.
-   */
-  private resolveApiError(err: unknown): ApiResponse<null> | null {
-    if (!err || typeof err !== 'object') {
-      return null;
-    }
-
-    if ('error' in err) {
-      const nested = (err as { error?: unknown }).error;
-      return nested && typeof nested === 'object' ? (nested as ApiResponse<null>) : null;
-    }
-
-    return err as ApiResponse<null>;
   }
 
   /**
@@ -350,7 +346,7 @@ export class NewServiceComponent implements OnInit {
   protected guardarServicio(): void {
     this.infoMessage.set(null);
 
-    if (this.saving()) {
+    if (this.saving() || !this.catalogsReady()) {
       return;
     }
 
@@ -362,77 +358,17 @@ export class NewServiceComponent implements OnInit {
 
     this.saving.set(true);
     this.errorMessage.set(null);
-    const raw = this.serviceForm.getRawValue();
-
-    if (this.catalog.contractPending) {
-      this.infoMessage.set('Contrato pendiente: el servicio no se envió. No existe un endpoint de creación.');
-      this.saving.set(false);
-      return;
-    }
-
-    const tecnico = this.tecnicosLista().find((item) => String(item.id) === raw.tecnicoSel);
-    const created = this.catalog.addDemoService({
-      fecha: raw.fechaServicio ?? '',
-      hora: raw.horaServicio ?? '',
-      asegurado: raw.nombreAsegurado ?? '',
-      aseguradora:
-        raw.aseguradora?.toUpperCase() === 'OTRO' ? (raw.aseguradoraOtro ?? '') : (raw.aseguradora ?? ''),
-      tecnicoId: raw.tecnicoSel === 'OTRO' ? 0 : Number(raw.tecnicoSel),
-      tecnicoNombre:
-        raw.tecnicoSel === 'OTRO'
-          ? (raw.tecnicoOtro ?? '')
-          : `${tecnico?.primerNombre ?? ''} ${tecnico?.primerApellido ?? ''}`.trim(),
-      estado: this.resolveLifecycle(raw.estadoServicioSel ?? ''),
-      autorizacion: raw.numAutorizacion ?? '',
-      origen: raw.origen ?? '',
-      destino: raw.destino ?? '',
-      ciudad: raw.ciudadDestino ?? '',
-      tipoServicio: raw.tipoServicio ?? '',
-      placa: raw.placaVehiculo ?? '',
-      telefono: requiresManualValue(raw.telefonoSel) ? (raw.telefonoOtro ?? '') : (raw.telefonoSel ?? ''),
-      valorAseguradora: 0,
-      valorTecnico: Number(raw.tarifaTecnicoOtro ?? 0) || 0,
-      numFactura: raw.numFactura || null,
-      estadoFactura: raw.estadoFactura ?? '',
-      observaciones: raw.observaciones ?? '',
-      evidencias: [],
-      fechaCierre: null,
+    this.newServiceService.saveService().subscribe({
+      error: (err: unknown) => {
+        this.errorMessage.set(
+          messageFromHttpError(
+            err,
+            'Contrato pendiente: no existe un endpoint para crear el servicio.',
+          ),
+        );
+        this.saving.set(false);
+      },
     });
-
-    this.limpiarFormulario();
-    this.infoMessage.set(
-      created
-        ? `Servicio ${created.registro} guardado en la simulación. El endpoint de creación sigue pendiente.`
-        : 'No se pudo guardar el servicio en la simulación.',
-    );
-    this.saving.set(false);
-  }
-
-  /**
-   * @function resolveLifecycle
-   * @description Traduce la descripción del catálogo de estados a la vista operativa.
-   * Si la descripción no coincide, el servicio queda pendiente.
-   * @param statusId Identificador elegido en el formulario.
-   * @returns Estado usado por los listados.
-   */
-  private resolveLifecycle(statusId: string): ServiceLifecycle {
-    const description = (
-      this.estadoServicioLista().find((item) => String(item.id) === statusId)?.descripcion ?? ''
-    ).toLowerCase();
-
-    if (description.includes('cancel')) {
-      return 'cancelado';
-    }
-    if (description.includes('final')) {
-      return 'finalizado';
-    }
-    if (description.includes('program')) {
-      return 'programado';
-    }
-    if (description.includes('proceso') || description.includes('curso')) {
-      return 'en_proceso';
-    }
-    return 'pendiente';
   }
 
   /**

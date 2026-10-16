@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { APP_ENVIRONMENT } from '../../../../core/config/app-environment';
 import { DEMO_CREDENTIALS } from '../../../../core/http/mock-api.store';
+import { readApiEnvelope } from '../../../../core/http/api-error';
 import { formatApiMessage } from '../../../../core/messages/app-messages';
-import type { ApiResponse } from '../../../../core/models';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 /**
@@ -94,7 +94,7 @@ export class LoginComponent {
       },
       error: (err: unknown) => {
         this.isLoading.set(false);
-        this.errorMessage.set(formatApiMessage(this.resolveApiError(err)));
+        this.errorMessage.set(formatApiMessage(readApiEnvelope(err)));
         this.errorOpen.set(true);
       },
     });
@@ -106,24 +106,5 @@ export class LoginComponent {
    */
   protected closeError(): void {
     this.errorOpen.set(false);
-  }
-
-  /**
-   * @function resolveApiError
-   * @description Normaliza errores HTTP o ApiResponse hacia un contrato común.
-   * @param err Error capturado por la suscripción.
-   * @returns Respuesta tipada o null cuando no se puede interpretar.
-   */
-  private resolveApiError(err: unknown): ApiResponse<null> | null {
-    if (!err || typeof err !== 'object') {
-      return null;
-    }
-
-    if ('error' in err) {
-      const nested = (err as { error?: unknown }).error;
-      return nested && typeof nested === 'object' ? (nested as ApiResponse<null>) : null;
-    }
-
-    return err as ApiResponse<null>;
   }
 }

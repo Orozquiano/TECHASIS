@@ -26,6 +26,7 @@ export class VehicleFormComponent implements OnChanges {
 
   @Input() vehicle: Vehicle | null = null;
   @Input() tiposVehiculo: TipoVehiculo[] = [];
+  @Input() pending = false;
   @Output() save = new EventEmitter<SaveVehicleDTO>();
   @Output() cancel = new EventEmitter<void>();
 

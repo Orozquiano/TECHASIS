@@ -1,8 +1,12 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import type { CustodyRecord } from '../../../../core/models';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
 import { formatCop, permanenciaTexto, valorAcumulado } from '../../../../core/operations/operation.logic';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
+import { TimeFieldComponent } from '../../../../shared/components/time-field/time-field.component';
 
 /**
  * @class WachenComponent
@@ -10,11 +14,36 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
  */
 @Component({
   selector: 'app-wachen',
-  imports: [PageHelpComponent],
+  imports: [FormsModule, PageHelpComponent, DateFieldComponent, SelectComponent, TimeFieldComponent],
   templateUrl: './wachen.component.html',
+  styleUrl: './wachen.component.scss',
 })
 export class WachenComponent implements OnInit {
   private readonly catalog = inject(OperationCatalogService);
+
+  /**
+   * @description Estados de custodia del filtro.
+   */
+  protected readonly custodyStatusOptions: SelectOption[] = [
+    { value: 'activa', label: 'Activas' },
+    { value: 'finalizada', label: 'Finalizadas' },
+  ];
+
+  /**
+   * @description Estados del formulario de custodia.
+   */
+  protected readonly formStatusOptions: SelectOption[] = [
+    { value: 'activa', label: 'Activa' },
+    { value: 'finalizada', label: 'Finalizada' },
+  ];
+
+  /**
+   * @description Opciones del filtro de reingreso.
+   */
+  protected readonly reentryOptions: SelectOption[] = [
+    { value: 'si', label: 'Con reingreso' },
+    { value: 'no', label: 'Sin reingreso' },
+  ];
 
   /**
    * @description Indica la carga inicial.
@@ -59,18 +88,7 @@ export class WachenComponent implements OnInit {
   /**
    * @description Campos del formulario de custodia.
    */
-  protected readonly form = signal({
-    vehiculo: '',
-    ingreso: '',
-    salida: '',
-    valor: '',
-    estado: 'activa',
-    observaciones: '',
-    reingreso: false,
-    tecnicoNombre: '',
-    aseguradora: '',
-    servicioRegistro: '',
-  });
+  protected readonly form = signal(emptyCustodyForm());
 
   /**
    * @description true cuando no hay endpoint de custodias.
@@ -153,6 +171,20 @@ export class WachenComponent implements OnInit {
   }
 
   /**
+   * @function clearForm
+   * @description Vacía el formulario de registro y cierra la confirmación.
+   */
+  protected clearForm(): void {
+    if (this.busy()) {
+      return;
+    }
+
+    this.form.set(emptyCustodyForm());
+    this.confirming.set(false);
+    this.errorMessage.set(null);
+  }
+
+  /**
    * @function save
    * @description Registra la custodia en demo o informa el contrato pendiente.
    */
@@ -227,34 +259,44 @@ export class WachenComponent implements OnInit {
    * @param event Evento del input.
    */
   protected onText(
-    field: 'vehiculo' | 'ingreso' | 'salida' | 'valor' | 'observaciones' | 'tecnicoNombre' | 'aseguradora' | 'servicioRegistro',
+    field: 'vehiculo' | 'valor' | 'observaciones' | 'tecnicoNombre' | 'aseguradora' | 'servicioRegistro',
     event: Event,
   ): void {
     this.patch(field, (event.target as HTMLInputElement).value);
   }
 
   /**
-   * @function onStatus
-   * @description Actualiza el filtro o el estado del formulario.
-   * @param target Destino del valor.
-   * @param event Evento del selector.
+   * @function datePart
+   * @description Separa la fecha de un valor fecha-hora.
+   * @param value Valor guardado. Puede estar vacío.
+   * @returns Fecha yyyy-mm-dd, o cadena vacía.
    */
-  protected onStatus(target: 'filter' | 'form', event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    if (target === 'filter') {
-      this.status.set(value);
-      return;
-    }
-    this.patch('estado', value);
+  protected datePart(value: string): string {
+    return value.split('T')[0] ?? '';
   }
 
   /**
-   * @function onReentryFilter
-   * @description Actualiza el filtro de reingreso.
-   * @param event Evento del selector.
+   * @function timePart
+   * @description Separa la hora de un valor fecha-hora.
+   * @param value Valor guardado. Puede estar vacío.
+   * @returns Hora HH:mm, o cadena vacía.
    */
-  protected onReentryFilter(event: Event): void {
-    this.reentry.set((event.target as HTMLSelectElement).value);
+  protected timePart(value: string): string {
+    return (value.split('T')[1] ?? '').slice(0, 5);
+  }
+
+  /**
+   * @function setDateTime
+   * @description Vuelve a armar la fecha y la hora de ingreso o salida.
+   * @param field Campo fecha-hora del formulario.
+   * @param part Parte que acaba de cambiar.
+   * @param value Nuevo valor de esa parte.
+   */
+  protected setDateTime(field: 'ingreso' | 'salida', part: 'date' | 'time', value: string): void {
+    const current = this.form()[field];
+    const date = part === 'date' ? value : this.datePart(current);
+    const time = part === 'time' ? value : this.timePart(current) || '00:00';
+    this.patch(field, date ? `${date}T${time || '00:00'}:00` : '');
   }
 
   /**
@@ -265,4 +307,35 @@ export class WachenComponent implements OnInit {
   protected onReentry(event: Event): void {
     this.patch('reingreso', (event.target as HTMLInputElement).checked);
   }
+}
+
+/**
+ * @function emptyCustodyForm
+ * @description Devuelve el formulario de custodia sin datos.
+ * @returns Campos vacíos, con estado activa.
+ */
+function emptyCustodyForm(): {
+  vehiculo: string;
+  ingreso: string;
+  salida: string;
+  valor: string;
+  estado: string;
+  observaciones: string;
+  reingreso: boolean;
+  tecnicoNombre: string;
+  aseguradora: string;
+  servicioRegistro: string;
+} {
+  return {
+    vehiculo: '',
+    ingreso: '',
+    salida: '',
+    valor: '',
+    estado: 'activa',
+    observaciones: '',
+    reingreso: false,
+    tecnicoNombre: '',
+    aseguradora: '',
+    servicioRegistro: '',
+  };
 }

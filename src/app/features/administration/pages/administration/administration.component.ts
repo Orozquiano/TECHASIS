@@ -1,32 +1,47 @@
 import { Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import type {
+  BaseRate,
+  CreateInsuranceDTO,
+  CreateMenuDTO,
   CreateUserDTO,
+  CreateVehicleTypeDTO,
   Insurance,
-  SaveInsuranceDTO,
+  MenuItem,
+  SaveBaseRateDTO,
   SaveServiceStatusDTO,
-  SaveUserDTO,
   SaveVehicleDTO,
   ServiceStatus,
+  TipoVehiculo,
+  UpdateInsuranceDTO,
+  UpdateUserDTO,
+  UpdateVehicleTypeDTO,
   User,
   UserInitDataParams,
   Vehicle,
   VehicleInitDataParams,
 } from '../../../../core/models';
+import { messageFromHttpError } from '../../../../core/http/api-error';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { Observable } from 'rxjs';
+import { BaseRateFormComponent } from '../../components/base-rate-form/base-rate-form.component';
 import { InsuranceFormComponent } from '../../components/insurance-form/insurance-form.component';
 import { StatusFormComponent } from '../../components/status-form/status-form.component';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
 import { VehicleFormComponent } from '../../components/vehicle-form/vehicle-form.component';
+import { VehicleTypeFormComponent } from '../../components/vehicle-type-form/vehicle-type-form.component';
+import { BaseRateService } from '../../services/base-rate.service';
 import { InsuranceService } from '../../services/insurance.service';
+import { MenuService } from '../../services/menu.service';
 import { ServiceStatusService } from '../../services/service-status.service';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { VehicleTypeService } from '../../services/vehicle-type.service';
 
 /**
  * @class AdministrationComponent
- * @description Pantalla de administración CRUD de usuarios, vehículos, aseguradoras y estados.
+ * @description Pantalla de administración de usuarios, vehículos, tipos, aseguradoras, estados, tarifas y menú.
  */
 @Component({
   selector: 'app-administration',
@@ -36,8 +51,10 @@ import { VehicleService } from '../../services/vehicle.service';
     ModalComponent,
     UserFormComponent,
     VehicleFormComponent,
+    VehicleTypeFormComponent,
     StatusFormComponent,
     InsuranceFormComponent,
+    BaseRateFormComponent,
   ],
   templateUrl: './administration.component.html',
   styleUrl: './administration.component.scss',
@@ -47,6 +64,9 @@ export class AdministrationComponent implements OnInit {
   private readonly vehicleService = inject(VehicleService);
   private readonly insuranceService = inject(InsuranceService);
   private readonly statusService = inject(ServiceStatusService);
+  private readonly vehicleTypeService = inject(VehicleTypeService);
+  private readonly baseRateService = inject(BaseRateService);
+  private readonly menuService = inject(MenuService);
 
   protected readonly userSearchCtrl = new FormControl('', { nonNullable: true });
   protected readonly vehicleSearchCtrl = new FormControl('', { nonNullable: true });
@@ -57,12 +77,25 @@ export class AdministrationComponent implements OnInit {
   protected readonly isVehiclesOpen = signal(false);
   protected readonly isInsurancesOpen = signal(false);
   protected readonly isStatusesOpen = signal(false);
+  protected readonly isTypesOpen = signal(false);
+  protected readonly isRatesOpen = signal(false);
+  protected readonly isMenusOpen = signal(false);
   protected readonly isModalLoading = signal(false);
+  protected readonly saving = signal(false);
+  protected readonly actionError = signal<string | null>(null);
 
   protected readonly users = signal<User[]>([]);
   protected readonly vehicles = signal<Vehicle[]>([]);
   protected readonly insurances = signal<Insurance[]>([]);
   protected readonly statuses = signal<ServiceStatus[]>([]);
+  protected readonly vehicleTypes = signal<TipoVehiculo[]>([]);
+  protected readonly rateInsurers = signal<Insurance[]>([]);
+  protected readonly createdRates = signal<BaseRate[]>([]);
+  protected readonly menus = signal<MenuItem[]>([]);
+  protected readonly selectedType = signal<TipoVehiculo | null>(null);
+  protected readonly isTypeModalOpen = signal(false);
+  protected readonly isRateModalOpen = signal(false);
+  protected readonly editingRateId = signal<number | null>(null);
 
   protected readonly userParams = signal<UserInitDataParams>({
     tiposDocumento: [],
@@ -137,9 +170,15 @@ export class AdministrationComponent implements OnInit {
    * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
   loadUsers(done?: () => void): void {
-    this.userService.getUsers().subscribe((res) => {
-      this.users.set(res.data || []);
-      done?.();
+    this.userService.getUsers().subscribe({
+      next: (res) => {
+        this.users.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar el listado de usuarios.');
+        done?.();
+      },
     });
   }
 
@@ -149,9 +188,15 @@ export class AdministrationComponent implements OnInit {
    * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
   loadVehicles(done?: () => void): void {
-    this.vehicleService.getVehicles().subscribe((res) => {
-      this.vehicles.set(res.data || []);
-      done?.();
+    this.vehicleService.getVehicles().subscribe({
+      next: (res) => {
+        this.vehicles.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar el listado de vehículos.');
+        done?.();
+      },
     });
   }
 
@@ -161,9 +206,15 @@ export class AdministrationComponent implements OnInit {
    * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
   loadInsurances(done?: () => void): void {
-    this.insuranceService.getInsurances().subscribe((res) => {
-      this.insurances.set(res.data || []);
-      done?.();
+    this.insuranceService.getInsurances().subscribe({
+      next: (res) => {
+        this.insurances.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar el listado de aseguradoras.');
+        done?.();
+      },
     });
   }
 
@@ -173,9 +224,50 @@ export class AdministrationComponent implements OnInit {
    * @param done Aviso opcional cuando el listado ya quedó en memoria.
    */
   loadStatuses(done?: () => void): void {
-    this.statusService.getServiceStatuses().subscribe((res) => {
-      this.statuses.set(res.data || []);
-      done?.();
+    this.statusService.getServiceStatuses().subscribe({
+      next: (res) => {
+        this.statuses.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar el listado de estados.');
+        done?.();
+      },
+    });
+  }
+
+  /**
+   * @function fail
+   * @description Publica el error de una operación sin cerrar el modal.
+   * @param err Error capturado.
+   * @param fallback Texto contextual.
+   */
+  private fail(err: unknown, fallback: string): void {
+    this.saving.set(false);
+    this.isModalLoading.set(false);
+    this.actionError.set(messageFromHttpError(err, fallback));
+  }
+
+  /**
+   * @function write
+   * @description Ejecuta una escritura evitando envíos duplicados.
+   * @param request Petición HTTP.
+   * @param onSuccess Acción tras una respuesta exitosa.
+   * @param fallback Texto si el backend no muestra su mensaje.
+   */
+  private write(request: Observable<unknown>, onSuccess: () => void, fallback: string): void {
+    if (this.saving()) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.actionError.set(null);
+    request.subscribe({
+      next: () => {
+        this.saving.set(false);
+        onSuccess();
+      },
+      error: (err: unknown) => this.fail(err, fallback),
     });
   }
 
@@ -184,7 +276,7 @@ export class AdministrationComponent implements OnInit {
    * @description Alterna una sección acordeón y carga datos la primera vez.
    * @param section Sección a abrir o cerrar.
    */
-  toggleSection(section: 'users' | 'vehicles' | 'insurances' | 'statuses'): void {
+  toggleSection(section: 'users' | 'vehicles' | 'insurances' | 'statuses' | 'types' | 'rates' | 'menus'): void {
     if (section === 'users') {
       this.toggleLoadedSection(this.isUsersOpen, this.users().length > 0, (done) => this.loadUsers(done));
     }
@@ -205,6 +297,22 @@ export class AdministrationComponent implements OnInit {
       this.toggleLoadedSection(this.isStatusesOpen, this.statuses().length > 0, (done) =>
         this.loadStatuses(done),
       );
+    }
+
+    if (section === 'types') {
+      this.toggleLoadedSection(this.isTypesOpen, this.vehicleTypes().length > 0, (done) =>
+        this.loadVehicleTypes(done),
+      );
+    }
+
+    if (section === 'rates') {
+      this.toggleLoadedSection(this.isRatesOpen, this.rateInsurers().length > 0, (done) =>
+        this.loadRateParams(done),
+      );
+    }
+
+    if (section === 'menus') {
+      this.toggleLoadedSection(this.isMenusOpen, this.menus().length > 0, (done) => this.loadMenus(done));
     }
   }
 
@@ -410,20 +518,34 @@ export class AdministrationComponent implements OnInit {
    * @description Crea o actualiza un usuario según el modo del modal.
    * @param dto Datos del formulario de usuario.
    */
-  saveUser(dto: SaveUserDTO): void {
+  saveUser(dto: CreateUserDTO | UpdateUserDTO): void {
     const currentUser = this.selectedUser();
 
     if (currentUser) {
-      this.userService.updateUser(currentUser.id, dto).subscribe(() => {
-        this.loadUsers();
-        this.closeUserModal();
-      });
-    } else {
-      this.userService.createUser(dto as CreateUserDTO).subscribe(() => {
-        this.loadUsers();
-        this.closeUserModal();
-      });
+      this.write(
+        this.userService.updateUser(currentUser.id, dto),
+        () => {
+          this.loadUsers();
+          this.closeUserModal();
+        },
+        'No se pudo actualizar el usuario.',
+      );
+      return;
     }
+
+    if (!('clave' in dto) || !dto.clave) {
+      this.actionError.set('La clave es obligatoria para crear el usuario.');
+      return;
+    }
+
+    this.write(
+      this.userService.createUser({ ...dto, clave: dto.clave }),
+      () => {
+        this.loadUsers();
+        this.closeUserModal();
+      },
+      'No se pudo crear el usuario.',
+    );
   }
 
   /**
@@ -433,18 +555,18 @@ export class AdministrationComponent implements OnInit {
    */
   saveVehicle(dto: SaveVehicleDTO): void {
     const currentVehicle = this.selectedVehicle();
+    const request = currentVehicle
+      ? this.vehicleService.updateVehicle(currentVehicle.id, dto)
+      : this.vehicleService.createVehicle(dto);
 
-    if (currentVehicle) {
-      this.vehicleService.updateVehicle(currentVehicle.id, dto).subscribe(() => {
+    this.write(
+      request,
+      () => {
         this.loadVehicles();
         this.closeVehicleModal();
-      });
-    } else {
-      this.vehicleService.createVehicle(dto).subscribe(() => {
-        this.loadVehicles();
-        this.closeVehicleModal();
-      });
-    }
+      },
+      'No se pudo guardar el vehículo.',
+    );
   }
 
   /**
@@ -452,19 +574,30 @@ export class AdministrationComponent implements OnInit {
    * @description Crea o actualiza una aseguradora según el modo del modal.
    * @param dto Datos del formulario de aseguradora.
    */
-  saveInsurance(dto: SaveInsuranceDTO): void {
+  saveInsurance(dto: CreateInsuranceDTO | UpdateInsuranceDTO): void {
     const currentInsurance = this.selectedInsurance();
 
-    if (currentInsurance) {
-      this.insuranceService.updateInsurance(currentInsurance.id, dto).subscribe(() => {
-        this.loadInsurances();
-        this.closeInsuranceModal();
-      });
-    } else {
-      this.insuranceService.createInsurance(dto).subscribe(() => {
-        this.loadInsurances();
-        this.closeInsuranceModal();
-      });
+    if (currentInsurance && 'activo' in dto) {
+      this.write(
+        this.insuranceService.updateInsurance(currentInsurance.id, dto),
+        () => {
+          this.loadInsurances();
+          this.closeInsuranceModal();
+        },
+        'No se pudo actualizar la aseguradora.',
+      );
+      return;
+    }
+
+    if (!('activo' in dto)) {
+      this.write(
+        this.insuranceService.createInsurance(dto),
+        () => {
+          this.loadInsurances();
+          this.closeInsuranceModal();
+        },
+        'No se pudo crear la aseguradora.',
+      );
     }
   }
 
@@ -475,18 +608,18 @@ export class AdministrationComponent implements OnInit {
    */
   saveStatus(dto: SaveServiceStatusDTO): void {
     const currentStatus = this.selectedStatus();
+    const request = currentStatus
+      ? this.statusService.updateServiceStatus(currentStatus.id, dto)
+      : this.statusService.createServiceStatus(dto);
 
-    if (currentStatus) {
-      this.statusService.updateServiceStatus(currentStatus.id, dto).subscribe(() => {
+    this.write(
+      request,
+      () => {
         this.loadStatuses();
         this.closeStatusModal();
-      });
-    } else {
-      this.statusService.createServiceStatus(dto).subscribe(() => {
-        this.loadStatuses();
-        this.closeStatusModal();
-      });
-    }
+      },
+      'No se pudo guardar el estado.',
+    );
   }
 
   /**
@@ -496,7 +629,7 @@ export class AdministrationComponent implements OnInit {
    */
   deleteUser(id: number): void {
     if (confirm('¿Desea eliminar este usuario?')) {
-      this.userService.deleteUser(id).subscribe(() => this.loadUsers());
+      this.write(this.userService.deleteUser(id), () => this.loadUsers(), 'No se pudo eliminar el usuario.');
     }
   }
 
@@ -507,7 +640,11 @@ export class AdministrationComponent implements OnInit {
    */
   deleteVehicle(id: number): void {
     if (confirm('¿Desea eliminar este vehículo?')) {
-      this.vehicleService.deleteVehicle(id).subscribe(() => this.loadVehicles());
+      this.write(
+        this.vehicleService.deleteVehicle(id),
+        () => this.loadVehicles(),
+        'No se pudo eliminar el vehículo.',
+      );
     }
   }
 
@@ -518,7 +655,11 @@ export class AdministrationComponent implements OnInit {
    */
   deleteInsurance(id: number): void {
     if (confirm('¿Desea eliminar esta aseguradora?')) {
-      this.insuranceService.deleteInsurance(id).subscribe(() => this.loadInsurances());
+      this.write(
+        this.insuranceService.deleteInsurance(id),
+        () => this.loadInsurances(),
+        'No se pudo eliminar la aseguradora.',
+      );
     }
   }
 
@@ -529,7 +670,192 @@ export class AdministrationComponent implements OnInit {
    */
   deleteStatus(id: number): void {
     if (confirm('¿Desea eliminar este estado?')) {
-      this.statusService.deleteServiceStatus(id).subscribe(() => this.loadStatuses());
+      this.write(
+        this.statusService.deleteServiceStatus(id),
+        () => this.loadStatuses(),
+        'No se pudo eliminar el estado.',
+      );
     }
+  }
+
+  /**
+   * @function loadVehicleTypes
+   * @description Recarga los tipos de vehículo.
+   * @param done Aviso al terminar.
+   */
+  loadVehicleTypes(done?: () => void): void {
+    this.vehicleTypeService.getVehicleTypes().subscribe({
+      next: (res) => {
+        this.vehicleTypes.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar los tipos de vehículo.');
+        done?.();
+      },
+    });
+  }
+
+  /**
+   * @function loadRateParams
+   * @description Carga las aseguradoras de la tarifa base. El listado remoto sigue pendiente.
+   * @param done Aviso al terminar.
+   */
+  loadRateParams(done?: () => void): void {
+    this.baseRateService.getParams().subscribe({
+      next: (res) => {
+        this.rateInsurers.set(res.data?.aseguradoras ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudieron cargar los parámetros de tarifas.');
+        done?.();
+      },
+    });
+  }
+
+  /**
+   * @function loadMenus
+   * @description Recarga el menú documentado.
+   * @param done Aviso al terminar.
+   */
+  loadMenus(done?: () => void): void {
+    this.menuService.getMenus().subscribe({
+      next: (res) => {
+        this.menus.set(res.data ?? []);
+        done?.();
+      },
+      error: (err: unknown) => {
+        this.fail(err, 'No se pudo cargar el menú.');
+        done?.();
+      },
+    });
+  }
+
+  /**
+   * @function openTypeModal
+   * @description Abre el formulario de tipo de vehículo.
+   * @param id Identificador a editar. Opcional.
+   */
+  openTypeModal(id?: number): void {
+    this.isTypeModalOpen.set(true);
+    this.selectedType.set(this.vehicleTypes().find((item) => item.id === id) ?? null);
+  }
+
+  /**
+   * @function closeTypeModal
+   * @description Cierra el formulario de tipo de vehículo.
+   */
+  closeTypeModal(): void {
+    this.isTypeModalOpen.set(false);
+    this.selectedType.set(null);
+  }
+
+  /**
+   * @function saveVehicleType
+   * @description Crea o actualiza un tipo de vehículo.
+   * @param dto Datos del formulario.
+   */
+  saveVehicleType(dto: CreateVehicleTypeDTO | UpdateVehicleTypeDTO): void {
+    const current = this.selectedType();
+    if (current && 'activo' in dto) {
+      this.write(
+        this.vehicleTypeService.updateVehicleType(current.id, dto),
+        () => {
+          this.loadVehicleTypes();
+          this.closeTypeModal();
+        },
+        'No se pudo actualizar el tipo de vehículo.',
+      );
+      return;
+    }
+
+    if (!('activo' in dto)) {
+      this.write(
+        this.vehicleTypeService.createVehicleType(dto),
+        () => {
+          this.loadVehicleTypes();
+          this.closeTypeModal();
+        },
+        'No se pudo crear el tipo de vehículo.',
+      );
+    }
+  }
+
+  /**
+   * @function deleteVehicleType
+   * @description Elimina un tipo de vehículo tras confirmación.
+   * @param id Identificador del tipo.
+   */
+  deleteVehicleType(id: number): void {
+    if (confirm('¿Desea eliminar este tipo de vehículo?')) {
+      this.write(
+        this.vehicleTypeService.deleteVehicleType(id),
+        () => this.loadVehicleTypes(),
+        'No se pudo eliminar el tipo de vehículo.',
+      );
+    }
+  }
+
+  /**
+   * @function openRateModal
+   * @description Abre el formulario de tarifa. La edición usa un id ya creado en esta sesión.
+   * @param id Identificador a actualizar. Opcional.
+   */
+  openRateModal(id?: number): void {
+    this.editingRateId.set(id ?? null);
+    this.isRateModalOpen.set(true);
+  }
+
+  /**
+   * @function closeRateModal
+   * @description Cierra el formulario de tarifa.
+   */
+  closeRateModal(): void {
+    this.isRateModalOpen.set(false);
+    this.editingRateId.set(null);
+  }
+
+  /**
+   * @function saveBaseRate
+   * @description Crea o actualiza una tarifa con las rutas confirmadas.
+   * @param dto Cuerpo documentado.
+   */
+  saveBaseRate(dto: SaveBaseRateDTO): void {
+    if (this.saving()) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.actionError.set(null);
+    const id = this.editingRateId();
+    const request = id
+      ? this.baseRateService.updateBaseRate(id, dto)
+      : this.baseRateService.createBaseRate(dto);
+
+    request.subscribe({
+      next: (res) => {
+        this.saving.set(false);
+        if (res.data) {
+          const saved = res.data;
+          this.createdRates.update((items) => [saved, ...items.filter((item) => item.id !== saved.id)]);
+        }
+        this.closeRateModal();
+      },
+      error: (err: unknown) => this.fail(err, 'No se pudo guardar la tarifa base.'),
+    });
+  }
+
+  /**
+   * @function createMenu
+   * @description Crea un ítem de menú con el cuerpo documentado.
+   * @param dto Datos del menú.
+   */
+  createMenu(dto: CreateMenuDTO): void {
+    this.write(
+      this.menuService.createMenu(dto),
+      () => this.loadMenus(),
+      'No se pudo crear el ítem de menú.',
+    );
   }
 }

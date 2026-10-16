@@ -15,19 +15,11 @@
     <div class="ops_filters">
       <div class="form-group">
         <label for="wa-estado">Estado</label>
-        <select id="wa-estado" [value]="status()" (change)="onStatus('filter', $event)">
-          <option value="">Todas</option>
-          <option value="activa">Activas</option>
-          <option value="finalizada">Finalizadas</option>
-        </select>
+        <app-select inputId="wa-estado" placeholder="Todas" [options]="custodyStatusOptions" [ngModel]="status()" (ngModelChange)="status.set($event)" />
       </div>
       <div class="form-group">
         <label for="wa-re">Reingreso</label>
-        <select id="wa-re" [value]="reentry()" (change)="onReentryFilter($event)">
-          <option value="">Todos</option>
-          <option value="si">Con reingreso</option>
-          <option value="no">Sin reingreso</option>
-        </select>
+        <app-select inputId="wa-re" placeholder="Todos" [options]="reentryOptions" [ngModel]="reentry()" (ngModelChange)="reentry.set($event)" />
       </div>
     </div>
 
@@ -79,23 +71,60 @@
         }
 
         <h2>Registrar custodia</h2>
-        <div class="form-group"><label for="wa-veh">Vehículo</label><input id="wa-veh" [value]="form().vehiculo" (input)="onText('vehiculo', $event)" /></div>
-        <div class="form-group"><label for="wa-in">Ingreso</label><input id="wa-in" type="datetime-local" [value]="form().ingreso" (input)="onText('ingreso', $event)" /></div>
-        <div class="form-group"><label for="wa-out">Salida</label><input id="wa-out" type="datetime-local" [value]="form().salida" (input)="onText('salida', $event)" /></div>
-        <div class="form-group"><label for="wa-val">Valor</label><input id="wa-val" type="number" min="0" [value]="form().valor" (input)="onText('valor', $event)" /></div>
-        <div class="form-group">
-          <label for="wa-fest">Estado</label>
-          <select id="wa-fest" [value]="form().estado" (change)="onStatus('form', $event)">
-            <option value="activa">Activa</option>
-            <option value="finalizada">Finalizada</option>
-          </select>
+        <div class="wa_form">
+          <div class="form-group">
+            <label for="wa-veh">Vehículo</label>
+            <input id="wa-veh" [value]="form().vehiculo" (input)="onText('vehiculo', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-in-date">Fecha de ingreso</label>
+            <app-date-field inputId="wa-in-date" [ngModel]="datePart(form().ingreso)" (ngModelChange)="setDateTime('ingreso', 'date', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-in-time">Hora de ingreso</label>
+            <app-time-field inputId="wa-in-time" [ngModel]="timePart(form().ingreso)" (ngModelChange)="setDateTime('ingreso', 'time', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-out-date">Fecha de salida</label>
+            <app-date-field inputId="wa-out-date" [ngModel]="datePart(form().salida)" (ngModelChange)="setDateTime('salida', 'date', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-out-time">Hora de salida</label>
+            <app-time-field inputId="wa-out-time" [ngModel]="timePart(form().salida)" (ngModelChange)="setDateTime('salida', 'time', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-val">Valor</label>
+            <input id="wa-val" type="number" min="0" [value]="form().valor" (input)="onText('valor', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-fest">Estado</label>
+            <app-select inputId="wa-fest" [options]="formStatusOptions" [ngModel]="form().estado" (ngModelChange)="patch('estado', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-obs">Observaciones</label>
+            <textarea id="wa-obs" rows="3" [value]="form().observaciones" (input)="onText('observaciones', $event)"></textarea>
+          </div>
+          <label class="checkbox-label" for="wa-flag">
+            <input id="wa-flag" type="checkbox" [checked]="form().reingreso" (change)="onReentry($event)" />
+            Tuvo reingreso
+          </label>
+          <div class="form-group">
+            <label for="wa-tec">Responsable</label>
+            <input id="wa-tec" [value]="form().tecnicoNombre" (input)="onText('tecnicoNombre', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-aseg">Aseguradora</label>
+            <input id="wa-aseg" [value]="form().aseguradora" (input)="onText('aseguradora', $event)" />
+          </div>
+          <div class="form-group">
+            <label for="wa-srv">Servicio relacionado</label>
+            <input id="wa-srv" [value]="form().servicioRegistro" (input)="onText('servicioRegistro', $event)" />
+          </div>
+          <div class="wa_actions">
+            <button class="btn-secondary" type="button" (click)="clearForm()" [disabled]="busy()">Limpiar</button>
+            <button class="btn-primary" type="button" (click)="askSave()" [disabled]="busy()">Registrar</button>
+          </div>
         </div>
-        <div class="form-group"><label for="wa-obs">Observaciones</label><textarea id="wa-obs" rows="3" [value]="form().observaciones" (input)="onText('observaciones', $event)"></textarea></div>
-        <label class="ops_meta" for="wa-flag"><input id="wa-flag" type="checkbox" [checked]="form().reingreso" (change)="onReentry($event)" /> Tuvo reingreso</label>
-        <div class="form-group"><label for="wa-tec">Responsable</label><input id="wa-tec" [value]="form().tecnicoNombre" (input)="onText('tecnicoNombre', $event)" /></div>
-        <div class="form-group"><label for="wa-aseg">Aseguradora</label><input id="wa-aseg" [value]="form().aseguradora" (input)="onText('aseguradora', $event)" /></div>
-        <div class="form-group"><label for="wa-srv">Servicio relacionado</label><input id="wa-srv" [value]="form().servicioRegistro" (input)="onText('servicioRegistro', $event)" /></div>
-        <button class="btn-primary" type="button" (click)="askSave()" [disabled]="busy()">Registrar</button>
         @if (confirming()) {
           <p class="ops_note">El valor queda como dato numérico, separado de las observaciones.</p>
           <div class="ops_actions">

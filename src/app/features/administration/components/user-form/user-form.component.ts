@@ -8,7 +8,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import type { Rol, SaveUserDTO, TipoDocumento, User } from '../../../../core/models';
+import type { CreateUserDTO, Rol, TipoDocumento, UpdateUserDTO, User } from '../../../../core/models';
 import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
@@ -40,9 +40,14 @@ export class UserFormComponent implements OnChanges {
   @Input() roles: Rol[] = [];
 
   /**
+   * @description Bloquea el envío mientras la petición está en curso.
+   */
+  @Input() pending = false;
+
+  /**
    * @description Emite el DTO listo para persistir.
    */
-  @Output() save = new EventEmitter<SaveUserDTO>();
+  @Output() save = new EventEmitter<CreateUserDTO | UpdateUserDTO>();
 
   /**
    * @description Emite cuando el usuario cancela el formulario.
@@ -124,11 +129,27 @@ export class UserFormComponent implements OnChanges {
    * @description Valida y emite los datos del formulario.
    */
   protected onSubmit(): void {
-    if (this.userForm.invalid) {
+    if (this.userForm.invalid || this.pending) {
       this.userForm.markAllAsTouched();
       return;
     }
 
-    this.save.emit(this.userForm.getRawValue() as SaveUserDTO);
+    const raw = this.userForm.getRawValue();
+    const base = {
+      tipoDocumentoId: raw.tipoDocumentoId ?? '',
+      documento: raw.documento ?? '',
+      rolId: raw.rolId ?? '',
+      primerNombre: raw.primerNombre ?? '',
+      segundoNombre: raw.segundoNombre ?? '',
+      primerApellido: raw.primerApellido ?? '',
+      segundoApellido: raw.segundoApellido ?? '',
+    };
+
+    if (this.user) {
+      this.save.emit(raw.clave ? { ...base, clave: raw.clave } : base);
+      return;
+    }
+
+    this.save.emit({ ...base, clave: raw.clave ?? '' });
   }
 }

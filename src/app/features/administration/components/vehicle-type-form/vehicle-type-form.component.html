@@ -1,0 +1,24 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+  <div class="form-group">
+    <label for="vt-nombre">Nombre *</label>
+    <input id="vt-nombre" type="text" formControlName="nombre" />
+  </div>
+  <div class="form-group">
+    <label for="vt-codigo">Código *</label>
+    <input id="vt-codigo" type="text" formControlName="codigo" />
+  </div>
+  <label class="checkbox-label" for="vt-carga">
+    <input id="vt-carga" type="checkbox" formControlName="carga" />
+    Carga
+  </label>
+  @if (vehicleType) {
+    <label class="checkbox-label" for="vt-activo">
+      <input id="vt-activo" type="checkbox" formControlName="activo" />
+      Activo
+    </label>
+  }
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="cancel.emit()" [disabled]="pending">Cancelar</button>
+    <button type="submit" class="btn-primary" [disabled]="pending">{{ vehicleType ? 'Actualizar' : 'Guardar' }}</button>
+  </div>
+</form>

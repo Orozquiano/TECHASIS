@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 import type { ServiceLifecycle, ServiceRecord } from '../../../../core/models';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
@@ -11,6 +12,7 @@ import {
   visibleServices,
 } from '../../../../core/operations/operation.logic';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class ServicesComponent
@@ -18,7 +20,7 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
  */
 @Component({
   selector: 'app-services',
-  imports: [PageHelpComponent],
+  imports: [FormsModule, PageHelpComponent, SelectComponent],
   templateUrl: './services.component.html',
 })
 export class ServicesComponent implements OnInit {
@@ -38,6 +40,19 @@ export class ServicesComponent implements OnInit {
    * @description Estados que la vista ofrece. El backend aún no confirma las transiciones.
    */
   protected readonly statuses = Object.entries(SERVICE_STATUS_LABEL) as [ServiceLifecycle, string][];
+
+  /**
+   * @description Estados que ofrece el selector del detalle.
+   */
+  protected readonly statusOptions: SelectOption[] = this.statuses.map(([value, label]) => ({ value, label }));
+
+  /**
+   * @description Mensajes que ofrece el selector del detalle.
+   */
+  protected readonly messageOptions: SelectOption[] = this.predefinedMessages.map((text) => ({
+    value: text,
+    label: text,
+  }));
 
   /**
    * @description Indica la carga inicial de la vista.
@@ -149,6 +164,13 @@ export class ServicesComponent implements OnInit {
     }
     return [...names.entries()].map(([id, nombre]) => ({ id, nombre }));
   });
+
+  /**
+   * @description Opciones del selector de técnico.
+   */
+  protected readonly technicianOptions = computed<SelectOption[]>(() =>
+    this.technicians().map((item) => ({ value: String(item.id), label: item.nombre })),
+  );
 
   /**
    * @function ngOnInit
@@ -328,29 +350,12 @@ export class ServicesComponent implements OnInit {
   }
 
   /**
-   * @function onStatus
-   * @description Actualiza el estado elegido.
-   * @param event Evento del selector.
+   * @function setLifecycle
+   * @description Guarda el estado elegido si pertenece al catálogo de la vista.
+   * @param value Código recibido del selector.
    */
-  protected onStatus(event: Event): void {
-    this.nextStatus.set((event.target as HTMLSelectElement).value as ServiceLifecycle);
-  }
-
-  /**
-   * @function onTechnician
-   * @description Actualiza el técnico elegido.
-   * @param event Evento del selector.
-   */
-  protected onTechnician(event: Event): void {
-    this.nextTechnician.set((event.target as HTMLSelectElement).value);
-  }
-
-  /**
-   * @function onMessage
-   * @description Actualiza el mensaje predefinido elegido.
-   * @param event Evento del selector.
-   */
-  protected onMessage(event: Event): void {
-    this.message.set((event.target as HTMLSelectElement).value);
+  protected setLifecycle(value: string): void {
+    const match = this.statuses.find(([code]) => code === value);
+    this.nextStatus.set(match ? match[0] : '');
   }
 }

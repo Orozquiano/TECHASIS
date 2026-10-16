@@ -24,10 +24,6 @@
   animation: main-in 0.45s ease 0.08s both;
 }
 
-.shell_stage[data-nav] {
-  overflow: clip;
-}
-
 @keyframes main-in {
   from {
     opacity: 0;
@@ -52,9 +48,5 @@
 @media (prefers-reduced-motion: reduce) {
   .shell_main {
     animation: none;
-  }
-
-  .shell_stage[data-nav] {
-    overflow: visible;
   }
 }

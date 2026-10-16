@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 import type { ServiceRecord } from '../../../../core/models';
 import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
@@ -11,6 +12,7 @@ import {
   visibleServices,
 } from '../../../../core/operations/operation.logic';
 import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class FilesComponent
@@ -18,7 +20,7 @@ import { PageHelpComponent } from '../../../../shared/components/page-help/page-
  */
 @Component({
   selector: 'app-files',
-  imports: [PageHelpComponent],
+  imports: [FormsModule, PageHelpComponent, SelectComponent],
   templateUrl: './files.component.html',
 })
 export class FilesComponent implements OnInit {
@@ -54,6 +56,24 @@ export class FilesComponent implements OnInit {
    * @description Filtro de estado de facturación.
    */
   protected readonly billing = signal('');
+
+  /**
+   * @description Estados de expediente filtrables.
+   */
+  protected readonly statusOptions: SelectOption[] = [
+    { value: 'finalizado', label: 'Finalizado' },
+    { value: 'cancelado', label: 'Cancelado' },
+    { value: 'programado', label: 'Programado' },
+  ];
+
+  /**
+   * @description Estados de facturación filtrables.
+   */
+  protected readonly billingOptions: SelectOption[] = [
+    { value: 'NO FACTURADO', label: 'No facturado' },
+    { value: 'FACTURADO', label: 'Facturado' },
+    { value: 'FACTURADO Y PAGADO', label: 'Facturado y pagado' },
+  ];
 
   /**
    * @description Expediente abierto.
@@ -194,24 +214,6 @@ export class FilesComponent implements OnInit {
    */
   protected onQuery(event: Event): void {
     this.query.set((event.target as HTMLInputElement).value);
-  }
-
-  /**
-   * @function onStatus
-   * @description Actualiza el filtro de estado.
-   * @param event Evento del selector.
-   */
-  protected onStatus(event: Event): void {
-    this.status.set((event.target as HTMLSelectElement).value);
-  }
-
-  /**
-   * @function onBilling
-   * @description Actualiza el filtro de facturación.
-   * @param event Evento del selector.
-   */
-  protected onBilling(event: Event): void {
-    this.billing.set((event.target as HTMLSelectElement).value);
   }
 
   /**

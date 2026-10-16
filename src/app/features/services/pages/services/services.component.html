@@ -70,33 +70,38 @@
           @if (administrative) {
             <div class="form-group">
               <label for="sv-tec">Reasignar técnico</label>
-              <select id="sv-tec" [value]="nextTechnician()" (change)="onTechnician($event)">
-                @for (tec of technicians(); track tec.id) {
-                  <option [value]="tec.id">{{ tec.nombre }}</option>
-                }
-              </select>
+              <app-select
+                inputId="sv-tec"
+                placeholder="— Selecciona —"
+                [options]="technicianOptions()"
+                [ngModel]="nextTechnician()"
+                (ngModelChange)="nextTechnician.set($event)"
+              />
             </div>
             <div class="ops_actions">
               <button class="btn-secondary" type="button" (click)="ask('asignacion')" [disabled]="busy()">Cambiar asignación</button>
             </div>
             <div class="form-group">
               <label for="sv-msg">Mensaje al técnico</label>
-              <select id="sv-msg" [value]="message()" (change)="onMessage($event)">
-                <option value="">— Selecciona —</option>
-                @for (text of predefinedMessages; track text) {
-                  <option [value]="text">{{ text }}</option>
-                }
-              </select>
+              <app-select
+                inputId="sv-msg"
+                placeholder="— Selecciona —"
+                [options]="messageOptions"
+                [ngModel]="message()"
+                (ngModelChange)="message.set($event)"
+              />
             </div>
             <button class="btn-secondary" type="button" (click)="ask('mensaje')" [disabled]="busy() || !message()">Preparar mensaje</button>
           } @else {
             <div class="form-group">
               <label for="sv-estado">Estado del servicio</label>
-              <select id="sv-estado" [value]="nextStatus()" (change)="onStatus($event)">
-                @for (status of statuses; track status[0]) {
-                  <option [value]="status[0]">{{ status[1] }}</option>
-                }
-              </select>
+              <app-select
+                inputId="sv-estado"
+                placeholder="— Selecciona —"
+                [options]="statusOptions"
+                [ngModel]="nextStatus()"
+                (ngModelChange)="setLifecycle($event)"
+              />
             </div>
             <button class="btn-secondary" type="button" (click)="ask('estado')" [disabled]="busy()">Cambiar estado</button>
             <div class="form-group">

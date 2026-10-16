@@ -11,10 +11,38 @@
     </p>
   }
 
-  <div class="form-group">
-    <label for="co-file">Archivo .csv o .txt</label>
-    <input id="co-file" type="file" accept=".csv,.txt,text/csv,text/plain" (change)="onFile($event)" />
-  </div>
+  <label
+    class="co_drop"
+    [class.is-filled]="fileName()"
+    [class.is-drag]="dragging()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <input
+      id="co-file"
+      class="co_drop_input"
+      type="file"
+      accept=".csv,.txt,text/csv,text/plain"
+      (change)="onFile($event)"
+    />
+    <span class="co_drop_icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 16V5" />
+        <path d="M7.5 9.5 12 5l4.5 4.5" />
+        <path d="M5 19h14" />
+      </svg>
+    </span>
+    <span class="co_drop_copy">
+      @if (fileName()) {
+        <strong>{{ fileName() }}</strong>
+        <span>Pulsa o suelta otro archivo para reemplazarlo</span>
+      } @else {
+        <strong>Seleccionar archivo</strong>
+        <span>CSV o TXT. También puedes soltarlo aquí.</span>
+      }
+    </span>
+  </label>
 
   @if (errorMessage()) {
     <p class="ops_error">{{ errorMessage() }}</p>
@@ -24,7 +52,7 @@
   }
 
   @if (draft(); as parsed) {
-    <p class="ops_meta">Archivo {{ fileName() }}</p>
+    <p class="ops_meta">Listo para cruzar</p>
     @if (!parsed.valido) {
       <p class="ops_error">Columnas faltantes: {{ parsed.columnasFaltantes.join(', ') }}. El archivo no se procesó.</p>
     } @else {

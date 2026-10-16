@@ -12,13 +12,30 @@ export interface Insurance {
 }
 
 /**
- * @interface SaveInsuranceDTO
- * @description Datos para crear o actualizar una aseguradora.
+ * @interface CreateInsuranceDTO
+ * @description Cuerpo documentado para crear una aseguradora. No incluye activo.
  */
-export interface SaveInsuranceDTO {
+export interface CreateInsuranceDTO {
+  /**
+   * @description Nombre de la aseguradora.
+   */
   nombre: string;
+
+  /**
+   * @description Código de la aseguradora.
+   */
   codigo: string;
-  activo?: boolean;
+}
+
+/**
+ * @interface UpdateInsuranceDTO
+ * @description Cuerpo documentado para actualizar una aseguradora.
+ */
+export interface UpdateInsuranceDTO extends CreateInsuranceDTO {
+  /**
+   * @description Indica si la aseguradora queda activa.
+   */
+  activo: boolean;
 }
 
 export type InsuranceListResponse = ApiResponse<Insurance[]>;

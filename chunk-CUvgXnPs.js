@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-v2XTWxCw.js`).then(o=>o.ConciliationsComponent)}];export{t as CONCILIATIONS_ROUTES};

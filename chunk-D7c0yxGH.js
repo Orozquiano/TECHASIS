@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-Pvagq_Eq.js`).then(o=>o.ReportsComponent)}];export{t as REPORTS_ROUTES};

@@ -1,0 +1,1 @@
+import{I as R,Pt as ro,lt as he,st as h}from"./main-BWVOIFQ6.js";function w(t){t||(t=h(he));let i=new R(e=>{if(t.destroyed){e.next();return}return t.onDestroy(e.next.bind(e))});return e=>e.pipe(ro(i))}export{w as t};

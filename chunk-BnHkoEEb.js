@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-CVtqlqq4.js`).then(o=>o.AdministrationComponent)}];export{t as ADMINISTRATION_ROUTES};

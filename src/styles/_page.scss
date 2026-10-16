@@ -29,9 +29,139 @@
 
 .placeholder p:last-child,
 .ns_hero p,
-.admin_hero p {
+.admin_hero p,
+.ops_hero p {
   margin: 8px 0 0;
   color: var(--muted);
   max-width: 40rem;
   line-height: 1.45;
+}
+
+.ops {
+  display: grid;
+  gap: 16px;
+  padding: 4px 0 28px;
+}
+
+.ops_hero h1 {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.125rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.ops_note,
+.ops_error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-group);
+  background: var(--fill-secondary);
+  line-height: 1.45;
+}
+
+.ops_error {
+  color: var(--danger);
+}
+
+.ops_filters,
+.ops_actions,
+.ops_meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ops_filters .form-group {
+  flex: 1 1 180px;
+  min-width: min(100%, 180px);
+}
+
+.ops_metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 10px;
+}
+
+.ops_metric,
+.ops_item,
+.ops_panel {
+  padding: 14px;
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-group);
+  background: var(--material);
+  backdrop-filter: blur(18px);
+}
+
+.ops_metric span,
+.ops_meta,
+.ops_pending {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ops_metric strong,
+.ops_item strong {
+  display: block;
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+}
+
+.ops_list {
+  display: grid;
+  gap: 8px;
+}
+
+.ops_item {
+  width: 100%;
+  min-height: 44px;
+  color: inherit;
+  text-align: left;
+}
+
+.ops_item_active {
+  box-shadow: 0 0 0 2px var(--brand-secondary);
+}
+
+.ops_split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.ops_actions button,
+.ops_filters button,
+.ops_panel button,
+.ops_panel select,
+.ops_panel input:not([type='checkbox']),
+.ops_panel textarea {
+  min-height: 44px;
+}
+
+.ops_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ops_table th,
+.ops_table td {
+  padding: 10px 8px;
+  border-bottom: 0.5px solid var(--separator);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ops_scroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 1080px) {
+  .ops_split {
+    grid-template-columns: 1fr;
+  }
 }

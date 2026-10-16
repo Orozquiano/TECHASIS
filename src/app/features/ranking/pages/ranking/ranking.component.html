@@ -1,5 +1,81 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Ranking <app-page-help /></h1>
-  <p>Ranking de técnicos. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Ranking <app-page-help /></h1>
+    <p>Técnicos ordenados por la suma del valor registrado a la aseguradora en servicios finalizados.</p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">Contrato pendiente: no hay un endpoint de ranking.</p>
+  }
+
+  <p class="ops_note">La rentabilidad no se muestra porque no hay una regla de negocio confirmada.</p>
+
+  @if (loading()) {
+    <p class="ops_note">Cargando ranking…</p>
+  } @else if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+    <button class="btn-secondary" type="button" (click)="retry()">Reintentar</button>
+  } @else {
+    <div class="ops_filters">
+      <div class="form-group"><label for="rk-desde">Desde</label><input id="rk-desde" type="date" [value]="desde()" (input)="onDate('desde', $event)" /></div>
+      <div class="form-group"><label for="rk-hasta">Hasta</label><input id="rk-hasta" type="date" [value]="hasta()" (input)="onDate('hasta', $event)" /></div>
+      <div class="form-group">
+        <label for="rk-aseg">Aseguradora</label>
+        <select id="rk-aseg" [value]="aseguradora()" (change)="onSelect('aseguradora', $event)">
+          <option value="">Todas</option>
+          @for (item of insurers(); track item) { <option [value]="item">{{ item }}</option> }
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rk-tipo">Tipo de servicio</label>
+        <select id="rk-tipo" [value]="tipo()" (change)="onSelect('tipo', $event)">
+          <option value="">Todos</option>
+          @for (item of types(); track item) { <option [value]="item">{{ item }}</option> }
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rk-est">Estado</label>
+        <select id="rk-est" [value]="estado()" (change)="onSelect('estado', $event)">
+          <option value="">Finalizados</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+
+    @if (rows().length === 0) {
+      <p class="ops_note">No hay técnicos con servicios finalizados en ese periodo.</p>
+    } @else {
+      <div class="ops_scroll">
+        <table class="ops_table">
+          <thead>
+            <tr>
+              <th>Técnico</th>
+              <th>Servicios</th>
+              <th>Dinero registrado</th>
+              <th>Valor al técnico</th>
+              <th>Utilidad</th>
+              <th>Rentabilidad</th>
+              <th>Periodo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of rows(); track item.tecnicoId) {
+              <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.servicios }}</td>
+                <td>{{ money(item.dineroGenerado) }}</td>
+                <td>{{ money(item.valorTecnico) }}</td>
+                <td>Regla pendiente</td>
+                <td>Regla pendiente</td>
+                <td>{{ item.periodo }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
 </section>

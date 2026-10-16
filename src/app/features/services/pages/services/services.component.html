@@ -1,5 +1,127 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Servicios <app-page-help /></h1>
-  <p>Listado de servicios pendientes. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Servicios <app-page-help /></h1>
+    <p>
+      @if (administrative) {
+        Vista administrativa: todos los servicios pendientes, programados o en proceso.
+      } @else {
+        Vista de técnico: solo los servicios asignados a tu usuario.
+      }
+    </p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">
+      Contrato pendiente: no hay un endpoint para listar, editar, reasignar, enviar mensajes ni cargar evidencias de servicios.
+      La pantalla no consulta otra API para sustituir esa operación.
+    </p>
+  } @else {
+    <p class="ops_note">Los cambios de esta pantalla quedan en la simulación demo. El backend todavía no los recibe.</p>
+  }
+
+  @if (loading()) {
+    <p class="ops_note">Cargando servicios…</p>
+  } @else if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+    <button class="btn-secondary" type="button" (click)="retry()">Reintentar</button>
+  } @else {
+    <div class="ops_filters">
+      <div class="form-group">
+        <label for="sv-q">Buscar</label>
+        <input id="sv-q" type="search" [value]="query()" (input)="onQuery($event)" placeholder="Registro, cliente, aseguradora o técnico" />
+      </div>
+    </div>
+
+    @if (infoMessage()) {
+      <p class="ops_note">{{ infoMessage() }}</p>
+    }
+
+    <div class="ops_split">
+      <div class="ops_list">
+        @if (rows().length === 0) {
+          <p class="ops_note">No hay servicios operativos para mostrar.</p>
+        } @else {
+          @for (item of rows(); track item.id) {
+            <button class="ops_item" type="button" [class.ops_item_active]="selectedId() === item.id" (click)="selectService(item)">
+              <strong>{{ item.registro }} · {{ statusLabel[item.estado] }}</strong>
+              <span class="ops_meta">
+                <span>{{ dateLabel(item.fecha) }} {{ item.hora }}</span>
+                <span>{{ item.asegurado }}</span>
+                <span>{{ item.aseguradora }}</span>
+                <span>{{ item.tecnicoNombre }}</span>
+              </span>
+            </button>
+          }
+        }
+      </div>
+
+      <aside class="ops_panel">
+        @if (selected(); as item) {
+          <h2>{{ item.registro }}</h2>
+          <p>{{ item.tipoServicio }} · {{ statusLabel[item.estado] }}</p>
+          <p>{{ item.asegurado }} · {{ item.telefono }}</p>
+          <p>{{ item.origen }} → {{ item.destino }}, {{ item.ciudad }}</p>
+          <p>Autorización {{ item.autorizacion }} · Placa {{ item.placa }}</p>
+          <p>Aseguradora {{ money(item.valorAseguradora) }} · Técnico {{ money(item.valorTecnico) }}</p>
+          <p>Factura {{ item.numFactura || 'sin número' }} · {{ item.estadoFactura || 'sin estado' }}</p>
+          <p>Evidencias: {{ item.evidencias.length ? item.evidencias.join(', ') : 'ninguna' }}</p>
+
+          @if (administrative) {
+            <div class="form-group">
+              <label for="sv-tec">Reasignar técnico</label>
+              <select id="sv-tec" [value]="nextTechnician()" (change)="onTechnician($event)">
+                @for (tec of technicians(); track tec.id) {
+                  <option [value]="tec.id">{{ tec.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="ops_actions">
+              <button class="btn-secondary" type="button" (click)="ask('asignacion')" [disabled]="busy()">Cambiar asignación</button>
+            </div>
+            <div class="form-group">
+              <label for="sv-msg">Mensaje al técnico</label>
+              <select id="sv-msg" [value]="message()" (change)="onMessage($event)">
+                <option value="">— Selecciona —</option>
+                @for (text of predefinedMessages; track text) {
+                  <option [value]="text">{{ text }}</option>
+                }
+              </select>
+            </div>
+            <button class="btn-secondary" type="button" (click)="ask('mensaje')" [disabled]="busy() || !message()">Preparar mensaje</button>
+          } @else {
+            <div class="form-group">
+              <label for="sv-estado">Estado del servicio</label>
+              <select id="sv-estado" [value]="nextStatus()" (change)="onStatus($event)">
+                @for (status of statuses; track status[0]) {
+                  <option [value]="status[0]">{{ status[1] }}</option>
+                }
+              </select>
+            </div>
+            <button class="btn-secondary" type="button" (click)="ask('estado')" [disabled]="busy()">Cambiar estado</button>
+            <div class="form-group">
+              <label for="sv-foto">Evidencia fotográfica</label>
+              <input id="sv-foto" type="file" accept="image/*" (change)="addEvidence($event)" />
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="sv-obs">Observaciones</label>
+            <textarea id="sv-obs" rows="3" [value]="note()" (input)="onNote($event)"></textarea>
+          </div>
+          <button class="btn-primary" type="button" (click)="saveNote()" [disabled]="busy()">Guardar observación</button>
+
+          @if (pendingAction()) {
+            <p class="ops_note">Confirma la operación. No se envía hasta que aceptes.</p>
+            <div class="ops_actions">
+              <button class="btn-primary" type="button" (click)="confirm()" [disabled]="busy()">Confirmar</button>
+              <button class="btn-secondary" type="button" (click)="pendingAction.set(null)">Cancelar</button>
+            </div>
+          }
+        } @else {
+          <p>Selecciona un servicio para ver contacto, ruta, valores y acciones de tu rol.</p>
+        }
+      </aside>
+    </div>
+  }
 </section>

@@ -1,5 +1,122 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Informes <app-page-help /></h1>
-  <p>Reportes operativos. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Informes <app-page-help /></h1>
+    <p>Conteos y sumas de valores ya registrados. Ventas, cartera, utilidad y rentabilidad esperan una regla de negocio.</p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">Contrato pendiente: no hay un endpoint de informes. Esta vista no inventa totales de producción.</p>
+  }
+
+  @if (loading()) {
+    <p class="ops_note">Cargando informe…</p>
+  } @else if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+    <button class="btn-secondary" type="button" (click)="retry()">Reintentar</button>
+  } @else {
+    <div class="ops_metrics">
+      <article class="ops_metric"><span>Servicios de hoy</span><strong>{{ dayCount() }}</strong></article>
+      <article class="ops_metric"><span>Servicios del mes</span><strong>{{ monthCount() }}</strong></article>
+      <article class="ops_metric"><span>Ventas del día</span><strong>Regla pendiente</strong></article>
+      <article class="ops_metric"><span>Ventas del mes</span><strong>Regla pendiente</strong></article>
+      <article class="ops_metric"><span>Pendiente por cobrar</span><strong>Regla pendiente</strong></article>
+      <article class="ops_metric"><span>Utilidad</span><strong>Regla pendiente</strong></article>
+    </div>
+
+    <div class="ops_list">
+      @for (item of byInsurer(); track item.aseguradora) {
+        <article class="ops_item">
+          <strong>{{ item.aseguradora }}</strong>
+          <span class="ops_meta"><span>{{ item.cantidad }} servicios en el resultado</span></span>
+        </article>
+      }
+    </div>
+
+    <div class="ops_filters">
+      <div class="form-group"><label for="rp-desde">Desde</label><input id="rp-desde" type="date" [value]="desde()" (input)="setText('desde', $event)" /></div>
+      <div class="form-group"><label for="rp-hasta">Hasta</label><input id="rp-hasta" type="date" [value]="hasta()" (input)="setText('hasta', $event)" /></div>
+      <div class="form-group">
+        <label for="rp-aseg">Aseguradora</label>
+        <select id="rp-aseg" [value]="aseguradora()" (change)="setSelect('aseguradora', $event)">
+          <option value="">Todas</option>
+          @for (item of insurers(); track item) { <option [value]="item">{{ item }}</option> }
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rp-tec">Técnico</label>
+        <select id="rp-tec" [value]="tecnicoId()" (change)="setSelect('tecnicoId', $event)">
+          <option value="">Todos</option>
+          @for (item of technicians(); track item.id) { <option [value]="item.id">{{ item.nombre }}</option> }
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rp-est">Estado</label>
+        <select id="rp-est" [value]="estado()" (change)="setSelect('estado', $event)">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="programado">Programado</option>
+          <option value="en_proceso">En proceso</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rp-fac">Facturación</label>
+        <select id="rp-fac" [value]="estadoFactura()" (change)="setSelect('estadoFactura', $event)">
+          <option value="">Todos</option>
+          <option value="NO FACTURADO">No facturado</option>
+          <option value="FACTURADO">Facturado</option>
+          <option value="FACTURADO Y PAGADO">Facturado y pagado</option>
+        </select>
+      </div>
+      <div class="form-group"><label for="rp-reg">Servicio</label><input id="rp-reg" [value]="registro()" (input)="setText('registro', $event)" /></div>
+      <div class="form-group"><label for="rp-aut">Autorización</label><input id="rp-aut" [value]="autorizacion()" (input)="setText('autorizacion', $event)" /></div>
+      <div class="form-group"><label for="rp-num">Factura</label><input id="rp-num" [value]="factura()" (input)="setText('factura', $event)" /></div>
+    </div>
+
+    <div class="ops_metrics">
+      <article class="ops_metric"><span>Servicios encontrados</span><strong>{{ report().cantidad }}</strong></article>
+      <article class="ops_metric"><span>Suma registrada a la aseguradora</span><strong>{{ money(report().totalAseguradora) }}</strong></article>
+      <article class="ops_metric"><span>Suma registrada al técnico</span><strong>{{ money(report().totalTecnico) }}</strong></article>
+      <article class="ops_metric"><span>Utilidad total</span><strong>Regla pendiente</strong></article>
+    </div>
+
+    @if (report().servicios.length === 0) {
+      <p class="ops_note">No hay servicios con esos filtros.</p>
+    } @else {
+      <div class="ops_scroll">
+        <table class="ops_table">
+          <thead>
+            <tr>
+              <th>Registro</th>
+              <th>Fecha</th>
+              <th>Asegurado</th>
+              <th>Aseguradora</th>
+              <th>Técnico</th>
+              <th>Estado</th>
+              <th>Factura</th>
+              <th>Valor aseguradora</th>
+              <th>Valor técnico</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of report().servicios; track item.id) {
+              <tr>
+                <td>{{ item.registro }}</td>
+                <td>{{ dateLabel(item.fecha) }}</td>
+                <td>{{ item.asegurado }}</td>
+                <td>{{ item.aseguradora }}</td>
+                <td>{{ item.tecnicoNombre }}</td>
+                <td>{{ item.estado }}</td>
+                <td>{{ item.numFactura || '—' }}</td>
+                <td>{{ money(item.valorAseguradora) }}</td>
+                <td>{{ money(item.valorTecnico) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
 </section>

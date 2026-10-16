@@ -1,5 +1,93 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Expedientes <app-page-help /></h1>
-  <p>Gestión de expedientes. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Expedientes <app-page-help /></h1>
+    <p>Servicios finalizados, cancelados y programados, con facturación, valores y evidencias.</p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">Contrato pendiente: no hay un endpoint de consulta ni de edición de expedientes.</p>
+  }
+
+  @if (loading()) {
+    <p class="ops_note">Cargando expedientes…</p>
+  } @else if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+    <button class="btn-secondary" type="button" (click)="retry()">Reintentar</button>
+  } @else {
+    <div class="ops_filters">
+      <div class="form-group">
+        <label for="fl-q">Buscar</label>
+        <input id="fl-q" type="search" [value]="query()" (input)="onQuery($event)" placeholder="Registro, autorización, cliente o factura" />
+      </div>
+      <div class="form-group">
+        <label for="fl-estado">Estado</label>
+        <select id="fl-estado" [value]="status()" (change)="onStatus($event)">
+          <option value="">Todos</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="cancelado">Cancelado</option>
+          <option value="programado">Programado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fl-fac">Facturación</label>
+        <select id="fl-fac" [value]="billing()" (change)="onBilling($event)">
+          <option value="">Todos</option>
+          <option value="NO FACTURADO">No facturado</option>
+          <option value="FACTURADO">Facturado</option>
+          <option value="FACTURADO Y PAGADO">Facturado y pagado</option>
+        </select>
+      </div>
+    </div>
+
+    @if (infoMessage()) {
+      <p class="ops_note">{{ infoMessage() }}</p>
+    }
+
+    <div class="ops_split">
+      <div class="ops_list">
+        @if (rows().length === 0) {
+          <p class="ops_note">No hay expedientes con esos filtros.</p>
+        } @else {
+          @for (item of rows(); track item.id) {
+            <button class="ops_item" type="button" [class.ops_item_active]="selectedId() === item.id" (click)="openFile(item)">
+              <strong>{{ item.registro }} · {{ statusLabel[item.estado] }}</strong>
+              <span class="ops_meta">
+                <span>{{ item.aseguradora }}</span>
+                <span>{{ item.tecnicoNombre }}</span>
+                <span>{{ item.estadoFactura }}</span>
+                <span>{{ item.numFactura || 'Sin factura' }}</span>
+              </span>
+            </button>
+          }
+        }
+      </div>
+
+      <aside class="ops_panel">
+        @if (selected(); as item) {
+          <h2>{{ item.registro }}</h2>
+          <p>Autorización {{ item.autorizacion }}</p>
+          <p>Estado {{ statusLabel[item.estado] }} · Creado {{ dateLabel(item.fecha) }}</p>
+          <p>Cierre, cancelación o programación {{ dateLabel(item.fechaCierre) }}</p>
+          <p>{{ item.aseguradora }} · {{ item.tecnicoNombre }}</p>
+          <p>{{ item.asegurado }} · {{ item.placa }}</p>
+          <p>Facturación {{ item.estadoFactura || 'sin estado' }} · {{ item.numFactura || 'sin número' }}</p>
+          <p>Aseguradora {{ money(item.valorAseguradora) }} · Técnico {{ money(item.valorTecnico) }}</p>
+          <p>Evidencias: {{ item.evidencias.length ? item.evidencias.join(', ') : 'ninguna' }}</p>
+          @if (administrative) {
+            <div class="form-group">
+              <label for="fl-obs">Observaciones</label>
+              <textarea id="fl-obs" rows="3" [value]="note()" (input)="onNote($event)"></textarea>
+            </div>
+            <button class="btn-primary" type="button" (click)="saveNote()" [disabled]="busy()">Guardar observación</button>
+          } @else {
+            <p>{{ item.observaciones || 'Sin observaciones.' }}</p>
+            <p class="ops_pending">Tu rol puede consultar el expediente. La edición queda reservada al rol administrativo.</p>
+          }
+        } @else {
+          <p>Selecciona un expediente para ver el detalle.</p>
+        }
+      </aside>
+    </div>
+  }
 </section>

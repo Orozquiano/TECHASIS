@@ -112,6 +112,7 @@ export class AuthService {
     const storage = this.activeStorage();
     storage.setItem('user_doc', profile.documento);
     storage.setItem('user_name', formatPersonName(profile));
+    storage.setItem('user_rol_id', String(profile.rolId));
   }
 
   /**
@@ -196,6 +197,21 @@ export class AuthService {
    */
   getUserId(): string | null {
     return localStorage.getItem('user_id') || sessionStorage.getItem('user_id');
+  }
+
+  /**
+   * @function getRolId
+   * @description Obtiene el rol guardado con el perfil autenticado.
+   * @returns Identificador de rol o null cuando el perfil aún no lo trajo.
+   */
+  getRolId(): number | null {
+    const raw = localStorage.getItem('user_rol_id') || sessionStorage.getItem('user_rol_id');
+    if (!raw) {
+      return null;
+    }
+
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
   }
 
   /**

@@ -296,10 +296,30 @@
         <p class="ns_aside-copy">
           Revisa los datos obligatorios y guarda el servicio cuando estén listos.
         </p>
-        <button class="btn-primary ns_full-btn" type="submit">Guardar servicio</button>
+        <button class="btn-primary ns_full-btn" type="submit" [disabled]="saving()">Guardar servicio</button>
         <button class="btn-secondary ns_full-btn" type="button" (click)="limpiarFormulario()">
           Limpiar formulario
         </button>
+      </app-card>
+
+      <app-card title="Últimos servicios">
+        @if (contractPending) {
+          <p class="ns_aside-copy">Contrato pendiente: no hay un endpoint para consultar los últimos servicios.</p>
+        } @else if (recientes().length === 0) {
+          <p class="ns_aside-copy">Todavía no hay servicios registrados en la simulación.</p>
+        } @else {
+          <div class="ns_recent">
+            @for (item of recientes(); track item.id) {
+              <article>
+                <strong>{{ item.registro }} · {{ statusLabel[item.estado] }}</strong>
+                <span>{{ dateLabel(item.fecha) }}</span>
+                <span>{{ item.asegurado }}</span>
+                <span>{{ item.aseguradora }}</span>
+                <span>{{ item.tecnicoNombre }}</span>
+              </article>
+            }
+          </div>
+        }
       </app-card>
     </aside>
   </form>

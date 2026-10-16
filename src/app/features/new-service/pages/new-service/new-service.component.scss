@@ -102,6 +102,25 @@
   margin-top: 10px;
 }
 
+.ns_recent {
+  display: grid;
+  gap: 8px;
+}
+
+.ns_recent article {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-top: 0.5px solid var(--separator);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ns_recent strong {
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
 @media (max-width: 960px) {
   .ns_grid {
     grid-template-columns: 1fr;

@@ -116,7 +116,7 @@ npm run build:demo
 npm run build:pages
 ```
 
-`build:pages` usa el modo demo y publica con la base `/TECHASIS/`.
+`build:pages` publica el ambiente dev en GitHub Pages, con la base `/TECHASIS/` y la API del backend de dev.
 
 ## Pruebas
 

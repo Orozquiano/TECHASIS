@@ -1,6 +1,6 @@
 # Techasis
 
-Frontend de gestión de servicios de grúas. Es una aplicación Angular 22.2.2 de una sola página: el inicio de sesión, la captura de servicios y la administración viven en el navegador y consumen la API del backend.
+Frontend de gestión de servicios de grúas. Es una aplicación Angular 22.2.3 de una sola página: el inicio de sesión, la captura de servicios y la administración viven en el navegador y consumen la API del backend.
 
 En modo demo no hace falta el backend. La aplicación responde con datos simulados en memoria.
 
@@ -10,8 +10,8 @@ Instala esto antes de clonar o correr el proyecto:
 
 | Herramienta | Versión |
 | --- | --- |
-| [Node.js](https://nodejs.org/) | 22.22.3 o superior en la rama 22, 24.15 o superior en la rama 24, o 26 |
-| npm | 11. El repositorio fija `npm@11.17.0` en `package.json` |
+| [Node.js](https://nodejs.org/) | 26.12.1. Angular 22 también admite 22.22.3+ y 24.15+ |
+| npm | 12. El repositorio fija `npm@12.2.1` en `package.json` |
 
 No hay otras dependencias de sistema. Angular, RxJS, TypeScript y Vitest se instalan con npm.
 
@@ -25,9 +25,9 @@ npm install
 
 Ese comando instala lo declarado en `package.json`:
 
-- Angular 22.2.2 (`@angular/core`, formularios, router y el resto de paquetes `@angular/*`)
+- Angular 22.2.3 (`@angular/core`, formularios, router y el resto de paquetes `@angular/*`)
 - RxJS 7 y `tslib`
-- Angular CLI 22.2.2 y el builder de la aplicación
+- Angular CLI 22.2.4 y el builder de la aplicación
 - TypeScript 6, Prettier, Vitest y jsdom, solo para desarrollo y pruebas
 
 ## Graphify (opcional)

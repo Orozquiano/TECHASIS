@@ -104,11 +104,11 @@
 @keyframes admin-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translate3d(0, 16px, 0) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -119,8 +119,22 @@
   min-height: var(--touch);
   padding: 12px 14px;
   background: var(--canvas);
-  border: 0;
+  border: 0.5px solid transparent;
   border-radius: var(--radius-control);
+  transition:
+    transform var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    box-shadow var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    border-color var(--motion-fast, 160ms) ease,
+    background-color var(--motion-fast, 160ms) ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--brand-secondary) 24%, var(--separator));
+      box-shadow: var(--shadow-soft);
+      background: var(--surface);
+    }
+  }
 }
 
 .admin_item-info {
@@ -187,9 +201,14 @@
 @media (prefers-reduced-motion: reduce) {
   .admin_panel,
   .admin_chevron,
+  .admin_item,
   .admin_panel.is-open .admin_item,
   .admin_panel.is-open .admin_empty {
     animation: none;
     transition: none;
+  }
+
+  .admin_item:hover {
+    transform: none;
   }
 }

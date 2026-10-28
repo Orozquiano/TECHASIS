@@ -14,7 +14,7 @@
     var(--shadow-nav);
   backdrop-filter: blur(22px) saturate(1.6);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
-  animation: nav-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: nav-in var(--motion-enter, 450ms) var(--motion-ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
 }
 
 .navbar_items {
@@ -112,9 +112,11 @@
 @keyframes nav-in {
   from {
     opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.98);
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

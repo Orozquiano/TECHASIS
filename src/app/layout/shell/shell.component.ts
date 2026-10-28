@@ -8,23 +8,14 @@ import {
   Router,
   RouterOutlet,
 } from '@angular/router';
+import {
+  MOTION_EASE_OUT,
+  MOTION_PAGE_ENTER_MS,
+  MOTION_PAGE_EXIT_MS,
+  prefersReducedMotion,
+} from '../../core/motion/motion.tokens';
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
-
-/**
- * @description Duración de la salida del contenido, en milisegundos.
- */
-const PAGE_EXIT_MS = 220;
-
-/**
- * @description Duración de la entrada del contenido nuevo, en milisegundos.
- */
-const PAGE_ENTER_MS = 320;
-
-/**
- * @description Curva compartida con la cápsula de selección.
- */
-const PAGE_MOTION_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 /**
  * @description Sentido del cambio según el orden visual de la navegación.
@@ -114,7 +105,7 @@ export class ShellComponent {
   private preparePageMotion(event: NavigationStart): void {
     this.finishPageMotion();
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion()) {
       return;
     }
 
@@ -192,17 +183,17 @@ export class ShellComponent {
     }
 
     stage.dataset['nav'] = this.motionDirection;
-    const easing = PAGE_MOTION_EASING;
+    const easing = MOTION_EASE_OUT;
 
     entering.style.opacity = '0';
-    entering.style.transform = 'translate3d(0, 12px, 0) scale(0.985)';
+    entering.style.transform = 'translate3d(0, 16px, 0) scale(0.96)';
 
     this.leavingAnimation = leaving.animate(
       [
         { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
-        { opacity: 0, transform: 'translate3d(0, -10px, 0) scale(0.985)' },
+        { opacity: 0, transform: 'translate3d(0, -12px, 0) scale(0.97)' },
       ],
-      { duration: PAGE_EXIT_MS, easing, fill: 'forwards' },
+      { duration: MOTION_PAGE_EXIT_MS, easing, fill: 'forwards' },
     );
 
     this.leavingAnimation.finished.then(
@@ -214,10 +205,10 @@ export class ShellComponent {
         leaving.style.visibility = 'hidden';
         this.enteringAnimation = entering.animate(
           [
-            { opacity: 0, transform: 'translate3d(0, 14px, 0) scale(0.985)' },
+            { opacity: 0, transform: 'translate3d(0, 18px, 0) scale(0.96)' },
             { opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' },
           ],
-          { duration: PAGE_ENTER_MS, easing, fill: 'forwards' },
+          { duration: MOTION_PAGE_ENTER_MS, easing, fill: 'forwards' },
         );
 
         this.enteringAnimation.finished.then(

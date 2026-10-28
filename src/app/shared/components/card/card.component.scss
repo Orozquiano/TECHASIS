@@ -1,4 +1,3 @@
-
 :host {
   display: block;
 }
@@ -8,6 +7,18 @@
   background: var(--surface);
   border: 0.5px solid var(--separator);
   border-radius: var(--radius-group);
+  transition:
+    transform var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    box-shadow var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    border-color var(--motion-fast, 160ms) ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-soft);
+      border-color: color-mix(in srgb, var(--brand-secondary) 28%, var(--separator));
+    }
+  }
 }
 
 .card_title {
@@ -32,5 +43,16 @@
 }
 
 .card_body {
+  min-height: 0;
   min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }

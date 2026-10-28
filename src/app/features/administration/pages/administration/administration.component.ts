@@ -14,6 +14,7 @@ import type {
   VehicleInitDataParams,
 } from '../../../../core/models';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
+import { StaggerEnterDirective } from '../../../../shared/directives/stagger-enter.directive';
 import { InsuranceFormComponent } from '../../components/insurance-form/insurance-form.component';
 import { StatusFormComponent } from '../../components/status-form/status-form.component';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
@@ -36,6 +37,7 @@ import { VehicleService } from '../../services/vehicle.service';
     VehicleFormComponent,
     StatusFormComponent,
     InsuranceFormComponent,
+    StaggerEnterDirective,
   ],
   templateUrl: './administration.component.html',
   styleUrl: './administration.component.scss',

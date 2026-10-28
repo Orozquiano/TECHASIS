@@ -1,5 +1,9 @@
-<section class="ns">
-  <header class="ns_hero">
+<section
+  class="ns"
+  appStaggerEnter
+  appStaggerEnterChildren=".ns_hero, .error-banner, .ns_info, .ns_main > app-card, .ns_aside"
+>
+  <header class="ns_hero motion-hero">
     <p class="ns_eyebrow">Operación</p>
     <h1>Nuevo servicio</h1>
     <p>Captura la información del asegurado, la ruta y la aseguradora.</p>
@@ -20,7 +24,7 @@
           @for (tipo of tiposServicio; track tipo.value) {
             <button
               type="button"
-              class="ns_pill"
+              class="ns_pill motion-press"
               [class.is-active]="serviceForm.get('tipoServicio')?.value === tipo.value"
               (click)="setTipoServicio(tipo.value)"
             >

@@ -1,0 +1,1 @@
+import{B as R,Pt as ro,ft as h,mt as he}from"./main-6I5AHHZE.js";function w(t){t||(t=h(he));let i=new R(e=>{if(t.destroyed){e.next();return}return t.onDestroy(e.next.bind(e))});return e=>e.pipe(ro(i))}export{w as t};

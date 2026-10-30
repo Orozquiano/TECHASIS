@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-CbWob2PN.js`).then(o=>o.AdministrationComponent)}];export{t as ADMINISTRATION_ROUTES};

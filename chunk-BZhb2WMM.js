@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-DbjibWrz.js`).then(o=>o.WachenComponent)}];export{t as WACHEN_ROUTES};

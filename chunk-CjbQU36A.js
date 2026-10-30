@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-BnRTd3-_.js`).then(o=>o.ConciliationsComponent)}];export{t as CONCILIATIONS_ROUTES};

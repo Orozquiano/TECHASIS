@@ -54,9 +54,11 @@
   border-radius: 999px;
   cursor: pointer;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+    background-color var(--motion-fast, 160ms) ease,
+    color var(--motion-fast, 160ms) ease,
+    border-color var(--motion-fast, 160ms) ease,
+    transform var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    box-shadow var(--motion-fast, 160ms) ease;
 
   &:hover {
     color: var(--text);
@@ -72,6 +74,7 @@
     color: var(--brand-on-primary);
     background: var(--brand-primary);
     border-color: var(--brand-primary);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--brand-primary) 28%, transparent);
   }
 }
 

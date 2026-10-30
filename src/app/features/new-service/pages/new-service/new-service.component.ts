@@ -9,6 +9,7 @@ import type {
   Vehicle,
 } from '../../../../core/models';
 import { CardComponent } from '../../../../shared/components/card/card.component';
+import { StaggerEnterDirective } from '../../../../shared/directives/stagger-enter.directive';
 import { NewServiceService } from '../../services/new-service.service';
 
 /**
@@ -17,7 +18,7 @@ import { NewServiceService } from '../../services/new-service.service';
  */
 @Component({
   selector: 'app-new-service',
-  imports: [CardComponent, ReactiveFormsModule],
+  imports: [CardComponent, ReactiveFormsModule, StaggerEnterDirective],
   templateUrl: './new-service.component.html',
   styleUrl: './new-service.component.scss',
 })

@@ -32,3 +32,34 @@
   max-width: 40rem;
   line-height: 1.45;
 }
+
+.placeholder,
+.ns_hero,
+.admin_hero {
+  &:not(.motion-hero) {
+    /* Las pantallas con motion-hero usan la coreografía tipográfica dedicada. */
+  }
+}
+
+.placeholder.motion-hero,
+.placeholder {
+  .placeholder_eyebrow {
+    animation: motion-fade-up 380ms var(--motion-ease-decel, ease) both;
+  }
+
+  h1 {
+    animation: motion-fade-up 420ms var(--motion-ease-out, ease) 60ms both;
+  }
+
+  p:last-child {
+    animation: motion-fade-up 420ms var(--motion-ease-out, ease) 120ms both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placeholder .placeholder_eyebrow,
+  .placeholder h1,
+  .placeholder p:last-child {
+    animation: none !important;
+  }
+}

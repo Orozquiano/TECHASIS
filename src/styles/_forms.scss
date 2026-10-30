@@ -73,12 +73,19 @@
   border-radius: var(--radius-control);
   cursor: pointer;
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    background-color var(--motion-fast, 160ms) ease,
+    color var(--motion-fast, 160ms) ease,
+    transform var(--motion-fast, 160ms) var(--motion-ease-decel, ease),
+    box-shadow var(--motion-fast, 160ms) ease;
 
   &:focus-visible {
     outline: 2px solid var(--brand-secondary);
     outline-offset: 2px;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+    transition-duration: 80ms;
   }
 }
 
@@ -89,6 +96,8 @@
 
   &:hover:not(:disabled) {
     background: color-mix(in srgb, var(--brand-primary) 82%, var(--brand-secondary));
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: var(--shadow-nav);
   }
 
   &:disabled {
@@ -104,6 +113,7 @@
 
   &:hover {
     background: color-mix(in srgb, var(--ink) 14%, var(--canvas));
+    transform: translateY(-1px);
   }
 }
 

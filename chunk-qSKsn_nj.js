@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-CgAx55DX.js`).then(o=>o.AdministrationComponent)}];export{t as ADMINISTRATION_ROUTES};

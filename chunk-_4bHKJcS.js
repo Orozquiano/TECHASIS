@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-DSOO0wJC.js`).then(o=>o.RankingComponent)}];export{t as RANKING_ROUTES};

@@ -1,0 +1,1 @@
+var t=[{path:``,loadComponent:()=>import(`./chunk-Dy6VRra6.js`).then(o=>o.WachenComponent)}];export{t as WACHEN_ROUTES};

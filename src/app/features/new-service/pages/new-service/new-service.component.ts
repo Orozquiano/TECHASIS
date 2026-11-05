@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import type {
-  ApiResponse,
   Insurance,
   ServiceStatus,
   Telefono,
@@ -9,7 +8,21 @@ import type {
   Vehicle,
 } from '../../../../core/models';
 import { CardComponent } from '../../../../shared/components/card/card.component';
-import { StaggerEnterDirective } from '../../../../shared/directives/stagger-enter.directive';
+import { PageHelpComponent } from '../../../../shared/components/page-help/page-help.component';
+import { DateFieldComponent } from '../../../../shared/components/date-field/date-field.component';
+import { TimeFieldComponent } from '../../../../shared/components/time-field/time-field.component';
+import {
+  SelectComponent,
+  type SelectOption,
+} from '../../../../shared/components/select/select.component';
+import { APP_ENVIRONMENT } from '../../../../core/config/app-environment';
+import { messageFromHttpError } from '../../../../core/http/api-error';
+import { OperationCatalogService } from '../../../../core/operations/operation-catalog.service';
+import {
+  SERVICE_STATUS_LABEL,
+  formatDateLabel,
+  requiresManualValue,
+} from '../../../../core/operations/operation.logic';
 import { NewServiceService } from '../../services/new-service.service';
 
 /**
@@ -18,13 +31,26 @@ import { NewServiceService } from '../../services/new-service.service';
  */
 @Component({
   selector: 'app-new-service',
-  imports: [CardComponent, ReactiveFormsModule, StaggerEnterDirective],
+  imports: [
+    CardComponent,
+    DateFieldComponent,
+    PageHelpComponent,
+    ReactiveFormsModule,
+    SelectComponent,
+    TimeFieldComponent,
+  ],
   templateUrl: './new-service.component.html',
   styleUrl: './new-service.component.scss',
 })
 export class NewServiceComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly newServiceService = inject(NewServiceService);
+  private readonly catalog = inject(OperationCatalogService);
+
+  /**
+   * @description El listado reciente no tiene endpoint. En demo se muestran datos locales.
+   */
+  protected readonly contractPending = !inject(APP_ENVIRONMENT).useMockApi;
 
   /**
    * @description Catálogo de teléfonos disponibles.
@@ -62,10 +88,94 @@ export class NewServiceComponent implements OnInit {
   protected readonly infoMessage = signal<string | null>(null);
 
   /**
+   * @description Evita enviar el formulario dos veces.
+   */
+  protected readonly saving = signal(false);
+
+  /**
+   * @description true cuando la creación de servicios no tiene endpoint.
+   */
+  protected readonly catalogsReady = signal(false);
+
+  /**
+   * @description Últimos servicios de la vista, del más reciente al más antiguo.
+   */
+  protected readonly recientes = computed(() => this.catalog.services().slice(0, 5));
+
+  /**
+   * @description Etiquetas de estado para el listado reciente.
+   */
+  protected readonly statusLabel = SERVICE_STATUS_LABEL;
+
+  /**
+   * @description Teléfonos listos para el selector.
+   */
+  protected readonly telefonoOptions = computed<SelectOption[]>(() =>
+    this.telefonosLista().map((tel) => ({ value: tel.descripcion, label: tel.descripcion })),
+  );
+
+  /**
+   * @description Técnicos listos para el selector.
+   */
+  protected readonly tecnicoOptions = computed<SelectOption[]>(() => [
+    ...this.tecnicosLista().map((tec) => ({
+      value: String(tec.id),
+      label: `${tec.primerNombre} ${tec.primerApellido}`,
+    })),
+    { value: 'OTRO', label: 'OTRO' },
+  ]);
+
+  /**
+   * @description Placas de grúa listas para el selector.
+   */
+  protected readonly gruaOptions = computed<SelectOption[]>(() => [
+    ...this.gruasLista().map((grua) => ({ value: String(grua.id), label: grua.placa })),
+    { value: 'OTRO', label: 'OTRO' },
+  ]);
+
+  /**
+   * @description Estados de servicio listos para el selector.
+   */
+  protected readonly estadoOptions = computed<SelectOption[]>(() =>
+    this.estadoServicioLista().map((estado) => ({
+      value: String(estado.id),
+      label: estado.descripcion,
+    })),
+  );
+
+  /**
+   * @description Tipos de vehículo del servicio.
+   */
+  protected readonly tipoVehiculoOptions: SelectOption[] = [
+    { value: 'liviano', label: 'Liviano' },
+    { value: 'semipesado', label: 'Semipesado' },
+  ];
+
+  /**
+   * @description Operadoras disponibles cuando la aseguradora es IKE.
+   */
+  protected readonly operadoraIkeOptions: SelectOption[] = [
+    { value: 'HDI', label: 'HDI' },
+    { value: 'HDI BRANDEADA', label: 'HDI BRANDEADA' },
+    { value: 'PREVISORA', label: 'PREVISORA' },
+    { value: 'MUNDIAL', label: 'MUNDIAL' },
+    { value: 'IKE CORP', label: 'IKE CORP' },
+  ];
+
+  /**
+   * @description Estados de facturación del servicio.
+   */
+  protected readonly estadoFacturaOptions: SelectOption[] = [
+    { value: 'NO FACTURADO', label: 'NO FACTURADO' },
+    { value: 'FACTURADO', label: 'FACTURADO' },
+    { value: 'FACTURADO Y PAGADO', label: 'FACTURADO Y PAGADO' },
+  ];
+
+  /**
    * @description Formulario reactivo del nuevo servicio.
    */
   protected readonly serviceForm = this.fb.group({
-    tipoServicio: ['GRUA', Validators.required],
+    tipoServicio: ['', Validators.required],
     registroNum: [{ value: '', disabled: true }],
     nombreAsegurado: ['', Validators.required],
     placaVehiculo: ['', Validators.required],
@@ -85,7 +195,7 @@ export class NewServiceComponent implements OnInit {
     aseguradoraOtro: [''],
     operadoraIke: [''],
     ciudadDestino: ['', Validators.required],
-    tipoVehiculo: ['liviano'],
+    tipoVehiculo: [''],
     kmNormal: [0],
     kmZonaRoja: [0],
     otroConcepto: [''],
@@ -93,7 +203,7 @@ export class NewServiceComponent implements OnInit {
     tarifaTecnicoSel: [''],
     tarifaTecnicoOtro: [null as number | null],
     observaciones: [''],
-    estadoFactura: ['NO FACTURADO'],
+    estadoFactura: [''],
     numFactura: [''],
   });
 
@@ -119,22 +229,32 @@ export class NewServiceComponent implements OnInit {
     this.serviceForm.get('aseguradora')?.valueChanges.subscribe((valor) => {
       this.handleConditionalValidators(valor ?? '');
     });
+    this.bindManualControl('telefonoSel', 'telefonoOtro');
+    this.bindManualControl('tecnicoSel', 'tecnicoOtro');
+    this.bindManualControl('placaGruaSel', 'placaGruaOtro');
   }
 
   /**
    * @function cargarDatosIniciales
    * @description Obtiene parámetros administrativos del backend.
    */
-  private cargarDatosIniciales(): void {
+  protected cargarDatosIniciales(): void {
     this.errorMessage.set(null);
 
     this.newServiceService.getServiceInitData().subscribe({
       next: (res) => {
-        const data = res.data!;
-        const aseguradoras = data.aseguradoras;
-
-        if (aseguradoras.length > 0) {
-          this.serviceForm.patchValue({ aseguradora: aseguradoras[0].nombre });
+        const data = res.data;
+        if (
+          !data ||
+          data.telefonos.length === 0 ||
+          data.usuariosTecnicos.length === 0 ||
+          data.gruas.length === 0 ||
+          data.estadosServicio.length === 0 ||
+          data.aseguradoras.length === 0
+        ) {
+          this.catalogsReady.set(false);
+          this.errorMessage.set('Faltan parámetros indispensables para registrar el servicio.');
+          return;
         }
 
         this.telefonosLista.set(data.telefonos);
@@ -142,36 +262,15 @@ export class NewServiceComponent implements OnInit {
         this.gruasLista.set(data.gruas);
         this.estadoServicioLista.set(data.estadosServicio);
         this.aseguradoraLista.set(data.aseguradoras);
+        this.catalogsReady.set(true);
       },
       error: (err: unknown) => {
-        const apiRes = this.resolveApiError(err);
-
-        if (apiRes?.showsMessage && apiRes.message) {
-          this.errorMessage.set(apiRes.message);
-        } else {
-          this.errorMessage.set('No se pudieron cargar los parámetros iniciales del servicio.');
-        }
+        this.catalogsReady.set(false);
+        this.errorMessage.set(
+          messageFromHttpError(err, 'No se pudieron cargar los parámetros iniciales del servicio.'),
+        );
       },
     });
-  }
-
-  /**
-   * @function resolveApiError
-   * @description Normaliza errores HTTP o ApiResponse hacia un contrato común.
-   * @param err Error capturado por la suscripción.
-   * @returns Respuesta tipada o null cuando no se puede interpretar.
-   */
-  private resolveApiError(err: unknown): ApiResponse<null> | null {
-    if (!err || typeof err !== 'object') {
-      return null;
-    }
-
-    if ('error' in err) {
-      const nested = (err as { error?: unknown }).error;
-      return nested && typeof nested === 'object' ? (nested as ApiResponse<null>) : null;
-    }
-
-    return err as ApiResponse<null>;
   }
 
   /**
@@ -222,11 +321,34 @@ export class NewServiceComponent implements OnInit {
   }
 
   /**
+   * @function bindManualControl
+   * @description Vuelve obligatorio el campo manual cuando la selección es OTRO.
+   * @param source Control del catálogo.
+   * @param manual Control que el usuario completa a mano.
+   */
+  private bindManualControl(source: string, manual: string): void {
+    this.serviceForm.get(source)?.valueChanges.subscribe((valor) => {
+      const control = this.serviceForm.get(manual);
+      if (requiresManualValue(valor)) {
+        control?.setValidators([Validators.required]);
+      } else {
+        control?.clearValidators();
+        control?.setValue('');
+      }
+      control?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  /**
    * @function guardarServicio
-   * @description Valida el formulario. El contrato POST permanece pendiente del backend.
+   * @description Valida el formulario y lo guarda en demo, o informa que el contrato de creación no existe.
    */
   protected guardarServicio(): void {
     this.infoMessage.set(null);
+
+    if (this.saving() || !this.catalogsReady()) {
+      return;
+    }
 
     if (this.serviceForm.invalid) {
       this.serviceForm.markAllAsTouched();
@@ -234,11 +356,29 @@ export class NewServiceComponent implements OnInit {
       return;
     }
 
+    this.saving.set(true);
     this.errorMessage.set(null);
-    this.infoMessage.set(
-      'Formulario listo. El endpoint de guardado se conectará cuando el backend lo exponga.',
-    );
-    console.info('Datos a enviar:', this.serviceForm.getRawValue());
+    this.newServiceService.saveService().subscribe({
+      error: (err: unknown) => {
+        this.errorMessage.set(
+          messageFromHttpError(
+            err,
+            'Contrato pendiente: no existe un endpoint para crear el servicio.',
+          ),
+        );
+        this.saving.set(false);
+      },
+    });
+  }
+
+  /**
+   * @function dateLabel
+   * @description Presenta la fecha de un servicio reciente.
+   * @param value Fecha yyyy-mm-dd.
+   * @returns Fecha visible.
+   */
+  protected dateLabel(value: string): string {
+    return formatDateLabel(value);
   }
 
   /**
@@ -246,15 +386,13 @@ export class NewServiceComponent implements OnInit {
    * @description Restablece el formulario a sus valores iniciales.
    */
   protected limpiarFormulario(): void {
-    const primera = this.aseguradoraLista()[0]?.nombre ?? '';
-
     this.serviceForm.reset({
-      tipoServicio: 'GRUA',
-      tipoVehiculo: 'liviano',
+      tipoServicio: '',
+      tipoVehiculo: '',
       kmNormal: 0,
       kmZonaRoja: 0,
-      estadoFactura: 'NO FACTURADO',
-      aseguradora: primera,
+      estadoFactura: '',
+      aseguradora: '',
       telefonoSel: '',
       tecnicoSel: '',
       placaGruaSel: '',

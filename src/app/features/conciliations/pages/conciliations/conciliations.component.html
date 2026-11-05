@@ -1,5 +1,115 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Conciliación</h1>
-  <p>Conciliación de servicios. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Conciliación <app-page-help /></h1>
+    <p>Carga un archivo con las columnas AUTORIZACION y NUMERO DE FACTURA. El cruce se muestra antes de asignar.</p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">
+      Contrato pendiente: no hay endpoint para guardar la conciliación. Puedes validar y previsualizar el archivo, pero no se escribirá en el backend.
+    </p>
+  }
+
+  <label
+    class="co_drop"
+    [class.is-filled]="fileName()"
+    [class.is-drag]="dragging()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <input
+      id="co-file"
+      class="co_drop_input"
+      type="file"
+      accept=".csv,.txt,text/csv,text/plain"
+      (change)="onFile($event)"
+    />
+    <span class="co_drop_icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 16V5" />
+        <path d="M7.5 9.5 12 5l4.5 4.5" />
+        <path d="M5 19h14" />
+      </svg>
+    </span>
+    <span class="co_drop_copy">
+      @if (fileName()) {
+        <strong>{{ fileName() }}</strong>
+        <span>Pulsa o suelta otro archivo para reemplazarlo</span>
+      } @else {
+        <strong>Seleccionar archivo</strong>
+        <span>CSV o TXT. También puedes soltarlo aquí.</span>
+      }
+    </span>
+  </label>
+
+  @if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+  }
+  @if (infoMessage()) {
+    <p class="ops_note">{{ infoMessage() }}</p>
+  }
+
+  @if (draft(); as parsed) {
+    <p class="ops_meta">Listo para cruzar</p>
+    @if (!parsed.valido) {
+      <p class="ops_error">Columnas faltantes: {{ parsed.columnasFaltantes.join(', ') }}. El archivo no se procesó.</p>
+    } @else {
+      <div class="ops_metrics">
+        <article class="ops_metric"><span>Filas listas</span><strong>{{ parsed.filas.length }}</strong></article>
+        <article class="ops_metric"><span>No encontradas</span><strong>{{ matches().filter(m => !m.encontrada).length }}</strong></article>
+        <article class="ops_metric"><span>Duplicadas</span><strong>{{ parsed.duplicados.length }}</strong></article>
+        <article class="ops_metric"><span>Inválidas</span><strong>{{ parsed.invalidas.length }}</strong></article>
+      </div>
+
+      <div class="ops_scroll">
+        <table class="ops_table">
+          <thead>
+            <tr>
+              <th>Autorización</th>
+              <th>Factura</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (match of matches(); track match.autorizacion) {
+              <tr>
+                <td>{{ match.autorizacion }}</td>
+                <td>{{ match.factura }}</td>
+                <td>{{ match.encontrada ? match.registro : 'No encontrada' }}</td>
+              </tr>
+            }
+            @for (item of parsed.duplicados; track item) {
+              <tr>
+                <td>{{ item }}</td>
+                <td></td>
+                <td>Duplicada, no se asigna</td>
+              </tr>
+            }
+            @for (item of parsed.invalidas; track item.linea) {
+              <tr>
+                <td>Línea {{ item.linea }}</td>
+                <td></td>
+                <td>{{ item.motivo }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ops_actions">
+        <button class="btn-primary" type="button" (click)="askApply()" [disabled]="busy() || matches().length === 0">Asignar facturas encontradas</button>
+        <button class="btn-secondary" type="button" (click)="download()">Descargar resultado</button>
+      </div>
+
+      @if (confirming()) {
+        <p class="ops_note">Se actualizarán solo las autorizaciones encontradas. Las demás filas no cambian.</p>
+        <div class="ops_actions">
+          <button class="btn-primary" type="button" (click)="apply()" [disabled]="busy()">Confirmar</button>
+          <button class="btn-secondary" type="button" (click)="confirming.set(false)">Cancelar</button>
+        </div>
+      }
+    }
+  }
 </section>

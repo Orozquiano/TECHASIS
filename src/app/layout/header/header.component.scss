@@ -22,6 +22,11 @@
   border: 1px solid var(--line);
   border-radius: 14px;
 
+  :host-context([data-theme='dark']) & {
+    background: var(--brand-fill);
+    border-color: color-mix(in srgb, var(--brand-on-fill) 16%, var(--brand-fill));
+  }
+
   img {
     width: 26px;
     height: 26px;

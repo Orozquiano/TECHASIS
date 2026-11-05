@@ -44,6 +44,20 @@
   gap: 8px;
 }
 
+.ns_tipo-select {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .ns_tipo-pills {
+    display: none;
+  }
+
+  .ns_tipo-select {
+    display: block;
+  }
+}
+
 .ns_pill {
   min-height: var(--touch);
   padding: 0 16px;
@@ -71,10 +85,9 @@
   }
 
   &.is-active {
-    color: var(--brand-on-primary);
-    background: var(--brand-primary);
-    border-color: var(--brand-primary);
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--brand-primary) 28%, transparent);
+    color: var(--brand-on-fill);
+    background: var(--brand-fill);
+    border-color: var(--brand-fill);
   }
 }
 
@@ -89,6 +102,25 @@
 .ns_full-btn {
   width: 100%;
   margin-top: 10px;
+}
+
+.ns_recent {
+  display: grid;
+  gap: 8px;
+}
+
+.ns_recent article {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-top: 0.5px solid var(--separator);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ns_recent strong {
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
 @media (max-width: 960px) {

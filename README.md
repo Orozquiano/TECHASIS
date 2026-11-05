@@ -1,59 +1,143 @@
 # Techasis
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Frontend de gestión de servicios de grúas. Es una aplicación Angular 22.2.3 de una sola página: el inicio de sesión, la captura de servicios y la administración viven en el navegador y consumen la API del backend.
 
-## Development server
+En modo demo no hace falta el backend. La aplicación responde con datos simulados en memoria.
 
-To start a local development server, run:
+## Requisitos
 
-```bash
-ng serve
-```
+Instala esto antes de clonar o correr el proyecto:
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+| Herramienta | Versión |
+| --- | --- |
+| [Node.js](https://nodejs.org/) | 26.12.1. Angular 22 también admite 22.22.3+ y 24.15+ |
+| npm | 12. El repositorio fija `npm@12.2.1` en `package.json` |
 
-## Code scaffolding
+No hay otras dependencias de sistema. Angular, RxJS, TypeScript y Vitest se instalan con npm.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Instalación
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+En la raíz del repositorio:
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
+Ese comando instala lo declarado en `package.json`:
 
-To build the project run:
+- Angular 22.2.3 (`@angular/core`, formularios, router y el resto de paquetes `@angular/*`)
+- RxJS 7 y `tslib`
+- Angular CLI 22.2.4 y el builder de la aplicación
+- TypeScript 6, Prettier, Vitest y jsdom, solo para desarrollo y pruebas
+
+## Graphify (opcional)
+
+No hace falta para correr la aplicación. Genera un grafo local del código en `graphify-out/` (esa carpeta no se versiona) para consultar archivos y dependencias antes de cambiar el proyecto.
+
+El paquete se llama `graphifyy` y el comando es `graphify`. Con [uv](https://docs.astral.sh/uv/):
 
 ```bash
-ng build
+uv tool install graphifyy
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+En la raíz del repositorio, crea o actualiza el grafo después de un cambio:
 
 ```bash
-ng test
+graphify update .
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Para que Cursor use ese grafo en este proyecto:
 
 ```bash
-ng e2e
+graphify cursor install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Cómo correrlo
 
-## Additional Resources
+La aplicación queda en [http://localhost:4200/](http://localhost:4200/). Al entrar pide inicio de sesión. La ruta autenticada por defecto es `/newService`.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Modo demo
+
+No necesita backend. Los datos viven en el navegador y se pierden al recargar.
+
+```bash
+npm run start:demo
+```
+
+Credenciales:
+
+- Usuario: `1111111111`
+- Contraseña: `admin`
+
+### Contra la API
+
+Estos comandos arrancan el servidor de desarrollo y envían las peticiones de `/api` al backend configurado en `proxy.conf.json` (`http://179.0.9.180:8080`).
+
+```bash
+npm start
+```
+
+Ese es el ambiente local (`development`). También puedes elegir otro:
+
+```bash
+npm run start:dev
+npm run start:test
+npm run start:preprod
+```
+
+`dev` usa la misma URL relativa `/api` que el ambiente local. `test`, `preprod` y producción apuntan directo a `http://179.0.9.180:8080/api`.
+
+## Ambientes
+
+| Script | Ambiente | API |
+| --- | --- | --- |
+| `npm start` | development | `/api`, con proxy al backend |
+| `npm run start:dev` | dev | `/api`, con proxy al backend |
+| `npm run start:test` | test | `http://179.0.9.180:8080/api` |
+| `npm run start:preprod` | preprod | `http://179.0.9.180:8080/api` |
+| `npm run start:demo` | demo | simulada en el navegador |
+
+La configuración de cada ambiente está en `src/environments/`. Esos archivos no deben contener secretos: el navegador puede leerlos.
+
+## Compilación
+
+```bash
+npm run build
+```
+
+Genera la compilación de producción en `dist/`. Variantes:
+
+```bash
+npm run build:dev
+npm run build:test
+npm run build:preprod
+npm run build:production
+npm run build:demo
+npm run build:pages
+```
+
+`build:pages` publica el ambiente dev en GitHub Pages, con la base `/TECHASIS/` y la API del backend de dev.
+
+## Pruebas
+
+```bash
+npm test
+```
+
+Las pruebas unitarias corren con Vitest.
+
+## Secciones
+
+Tras iniciar sesión, la navegación incluye:
+
+| Ruta | Sección |
+| --- | --- |
+| `/newService` | Nuevo servicio |
+| `/services` | Servicios |
+| `/files` | Expedientes |
+| `/conciliations` | Conciliación |
+| `/reports` | Informes |
+| `/ranking` | Ranking |
+| `/wachen` | Custodias |
+| `/administration` | Administración |
+| `/login` | Inicio de sesión |

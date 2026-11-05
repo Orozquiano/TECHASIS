@@ -77,10 +77,10 @@ export class UserService {
    * @param user Datos del usuario a crear.
    * @returns Resultado de la operación.
    */
-  createUser(user: CreateUserDTO): Observable<UserActionResponse> {
-    return this.http.post<UserActionResponse>(`${this.env.apiUrl}/user`, user).pipe(
+  createUser(user: CreateUserDTO): Observable<UserSingleResponse> {
+    return this.http.post<UserSingleResponse>(`${this.env.apiUrl}/user`, user).pipe(
       map((res) => {
-        if (!res.success) {
+        if (!res.success || !res.data) {
           throw res;
         }
         return res;
@@ -95,10 +95,10 @@ export class UserService {
    * @param user Datos actualizados.
    * @returns Resultado de la operación.
    */
-  updateUser(id: number, user: UpdateUserDTO): Observable<UserActionResponse> {
-    return this.http.put<UserActionResponse>(`${this.env.apiUrl}/user/${id}`, user).pipe(
+  updateUser(id: number, user: UpdateUserDTO): Observable<UserSingleResponse> {
+    return this.http.put<UserSingleResponse>(`${this.env.apiUrl}/user/${id}`, user).pipe(
       map((res) => {
-        if (!res.success) {
+        if (!res.success || !res.data) {
           throw res;
         }
         return res;

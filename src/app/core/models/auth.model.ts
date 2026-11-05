@@ -1,4 +1,7 @@
 import type { ApiResponse } from './api-response.model';
+import type { MenuItem } from './menu.model';
+
+export type { MenuItem } from './menu.model';
 
 /**
  * @interface LoginRequest
@@ -45,37 +48,6 @@ export interface AuthUserData {
    * @description Documento del usuario autenticado.
    */
   documento: string;
-}
-
-/**
- * @interface MenuItem
- * @description Opción de menú autorizada para el usuario autenticado.
- */
-export interface MenuItem {
-  /**
-   * @description Identificador del ítem de menú.
-   */
-  id: number;
-
-  /**
-   * @description Identificador del menú padre. Puede ser null.
-   */
-  padreMenuId: number | null;
-
-  /**
-   * @description Nombre de ruta asociado al ítem.
-   */
-  nombre: string;
-
-  /**
-   * @description Descripción visible del ítem.
-   */
-  descripcion: string;
-
-  /**
-   * @description Código interno del ítem.
-   */
-  codigo: string;
 }
 
 /**

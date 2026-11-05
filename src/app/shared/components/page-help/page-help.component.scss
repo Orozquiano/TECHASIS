@@ -1,0 +1,74 @@
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.page_help {
+  position: relative;
+  display: inline-flex;
+}
+
+.page_help_trigger {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: help;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--text);
+    background: var(--fill-secondary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-secondary);
+    outline-offset: 2px;
+  }
+}
+
+.page_help_tip {
+  position: fixed;
+  z-index: 80;
+  width: min(340px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  overflow-wrap: anywhere;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-sans, "DM Sans", "Segoe UI", sans-serif);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+  background: var(--surface-secondary);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-group);
+  box-shadow: var(--shadow-panel);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+}
+
+.page_help:hover .page_help_tip,
+.page_help:focus-within .page_help_tip {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page_help_tip {
+    transition:
+      opacity 0.16s ease,
+      transform 0.16s ease;
+  }
+}

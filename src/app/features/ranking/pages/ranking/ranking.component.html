@@ -1,5 +1,76 @@
-<section class="placeholder">
-  <p class="placeholder_eyebrow">Techasis</p>
-  <h1>Ranking</h1>
-  <p>Ranking de técnicos. Módulo en preparación.</p>
+<section class="ops">
+  <header class="ops_hero">
+    <p class="placeholder_eyebrow">Techasis</p>
+    <h1>Ranking <app-page-help /></h1>
+    <p>Técnicos ordenados por la suma del valor registrado a la aseguradora en servicios finalizados.</p>
+  </header>
+
+  @if (contractPending) {
+    <p class="ops_note">Contrato pendiente: no hay un endpoint de ranking.</p>
+  }
+
+  <p class="ops_note">La rentabilidad no se muestra porque no hay una regla de negocio confirmada.</p>
+
+  @if (loading()) {
+    <p class="ops_note">Cargando ranking…</p>
+  } @else if (errorMessage()) {
+    <p class="ops_error">{{ errorMessage() }}</p>
+    <button class="btn-secondary" type="button" (click)="retry()">Reintentar</button>
+  } @else {
+    <div class="ops_filters">
+      <div class="form-group">
+        <label for="rk-desde">Desde</label>
+        <app-date-field inputId="rk-desde" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+      </div>
+      <div class="form-group">
+        <label for="rk-hasta">Hasta</label>
+        <app-date-field inputId="rk-hasta" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+      </div>
+      <div class="form-group">
+        <label for="rk-aseg">Aseguradora</label>
+        <app-select inputId="rk-aseg" placeholder="Todas" [options]="insurerOptions()" [ngModel]="aseguradora()" (ngModelChange)="aseguradora.set($event)" />
+      </div>
+      <div class="form-group">
+        <label for="rk-tipo">Tipo de servicio</label>
+        <app-select inputId="rk-tipo" placeholder="Todos" [options]="typeOptions()" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" />
+      </div>
+      <div class="form-group">
+        <label for="rk-est">Estado</label>
+        <app-select inputId="rk-est" placeholder="Finalizados" [options]="statusOptions" [ngModel]="estado()" (ngModelChange)="estado.set($event)" />
+      </div>
+    </div>
+
+    @if (rows().length === 0) {
+      <p class="ops_note">No hay técnicos con servicios finalizados en ese periodo.</p>
+    } @else {
+      <div class="ops_scroll">
+        <table class="ops_table">
+          <thead>
+            <tr>
+              <th>Técnico</th>
+              <th>Servicios</th>
+              <th>Dinero registrado</th>
+              <th>Valor al técnico</th>
+              <th>Utilidad</th>
+              <th>Rentabilidad</th>
+              <th>Periodo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of rows(); track item.tecnicoId) {
+              <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.servicios }}</td>
+                <td>{{ money(item.dineroGenerado) }}</td>
+                <td>{{ money(item.valorTecnico) }}</td>
+                <td>Regla pendiente</td>
+                <td>Regla pendiente</td>
+                <td>{{ item.periodo }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
 </section>

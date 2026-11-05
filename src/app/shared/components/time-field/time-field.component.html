@@ -1,0 +1,59 @@
+<div class="picker" [class.is-up]="dropUp()">
+  <button
+    #trigger
+    class="picker_trigger"
+    type="button"
+    [id]="inputId()"
+    [disabled]="disabled()"
+    [class.is-empty]="!label()"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="dialog"
+    (click)="toggle()"
+  >
+    <span class="picker_value">{{ label() || placeholder() }}</span>
+    <svg class="picker_icon" viewBox="0 0 20 20" aria-hidden="true">
+      <circle cx="10" cy="10" r="6.5" />
+      <path d="M10 6.5V10l2.5 1.5" />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <div #menu class="picker_menu" role="dialog" aria-label="Hora">
+      <div class="time_head" aria-hidden="true">
+        <span>Hora</span>
+        <span>Min</span>
+      </div>
+      <div class="time_board">
+        <div class="time_col" role="listbox" aria-label="Hora">
+          @for (hour of hours; track hour) {
+            <button
+              class="time_option"
+              type="button"
+              role="option"
+              [class.is-selected]="hour === parts().hour"
+              [attr.aria-selected]="hour === parts().hour"
+              (click)="pickHour(hour)"
+            >
+              {{ hour }}
+            </button>
+          }
+        </div>
+        <div class="time_col" role="listbox" aria-label="Minutos">
+          @for (minute of minutes(); track minute) {
+            <button
+              class="time_option"
+              type="button"
+              role="option"
+              [class.is-selected]="minute === parts().minute"
+              [attr.aria-selected]="minute === parts().minute"
+              (click)="pickMinute(minute)"
+            >
+              {{ minute }}
+            </button>
+          }
+        </div>
+      </div>
+      <button class="time_now" type="button" (click)="chooseNow()">Ahora</button>
+    </div>
+  }
+</div>

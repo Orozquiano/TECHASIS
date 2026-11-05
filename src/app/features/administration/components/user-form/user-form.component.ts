@@ -8,7 +8,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import type { Rol, SaveUserDTO, TipoDocumento, User } from '../../../../core/models';
+import type { CreateUserDTO, Rol, TipoDocumento, UpdateUserDTO, User } from '../../../../core/models';
+import { SelectComponent, type SelectOption } from '../../../../shared/components/select/select.component';
 
 /**
  * @class UserFormComponent
@@ -16,7 +17,7 @@ import type { Rol, SaveUserDTO, TipoDocumento, User } from '../../../../core/mod
  */
 @Component({
   selector: 'app-user-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SelectComponent],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.scss',
 })
@@ -39,14 +40,39 @@ export class UserFormComponent implements OnChanges {
   @Input() roles: Rol[] = [];
 
   /**
+   * @description Bloquea el envío mientras la petición está en curso.
+   */
+  @Input() pending = false;
+
+  /**
    * @description Emite el DTO listo para persistir.
    */
-  @Output() save = new EventEmitter<SaveUserDTO>();
+  @Output() save = new EventEmitter<CreateUserDTO | UpdateUserDTO>();
 
   /**
    * @description Emite cuando el usuario cancela el formulario.
    */
   @Output() cancel = new EventEmitter<void>();
+
+  /**
+   * @description Opciones del tipo de documento, sin la entrada vacía de ayuda.
+   */
+  protected get tipoDocumentoOptions(): SelectOption[] {
+    return this.tiposDocumento.map((tipo) => ({
+      value: String(tipo.id),
+      label: `${tipo.nombre} (${tipo.codigo})`,
+    }));
+  }
+
+  /**
+   * @description Opciones de rol, sin la entrada vacía de ayuda.
+   */
+  protected get rolOptions(): SelectOption[] {
+    return this.roles.map((rol) => ({
+      value: String(rol.id),
+      label: rol.nombre,
+    }));
+  }
 
   /**
    * @description Grupo de controles del formulario de usuario.
@@ -103,11 +129,27 @@ export class UserFormComponent implements OnChanges {
    * @description Valida y emite los datos del formulario.
    */
   protected onSubmit(): void {
-    if (this.userForm.invalid) {
+    if (this.userForm.invalid || this.pending) {
       this.userForm.markAllAsTouched();
       return;
     }
 
-    this.save.emit(this.userForm.getRawValue() as SaveUserDTO);
+    const raw = this.userForm.getRawValue();
+    const base = {
+      tipoDocumentoId: raw.tipoDocumentoId ?? '',
+      documento: raw.documento ?? '',
+      rolId: raw.rolId ?? '',
+      primerNombre: raw.primerNombre ?? '',
+      segundoNombre: raw.segundoNombre ?? '',
+      primerApellido: raw.primerApellido ?? '',
+      segundoApellido: raw.segundoApellido ?? '',
+    };
+
+    if (this.user) {
+      this.save.emit(raw.clave ? { ...base, clave: raw.clave } : base);
+      return;
+    }
+
+    this.save.emit({ ...base, clave: raw.clave ?? '' });
   }
 }

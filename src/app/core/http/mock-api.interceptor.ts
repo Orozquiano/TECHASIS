@@ -8,16 +8,21 @@ import {
 import { inject } from '@angular/core';
 import { Observable, of, throwError, timer } from 'rxjs';
 import { delay, mergeMap } from 'rxjs/operators';
+import { buildDemoAccessToken } from '../auth/access-token';
 import { APP_ENVIRONMENT } from '../config/app-environment';
 import type {
   ApiResponse,
+  CreateInsuranceDTO,
   CreateUserDTO,
-  SaveInsuranceDTO,
+  CreateVehicleTypeDTO,
+  SaveBaseRateDTO,
   SaveServiceStatusDTO,
   SaveUserDTO,
   SaveVehicleDTO,
+  UpdateInsuranceDTO,
+  UpdateVehicleTypeDTO,
 } from '../models';
-import { createDemoMenu, DEMO_CREDENTIALS, mockApiStore } from './mock-api.store';
+import { DEMO_CREDENTIALS, mockApiStore } from './mock-api.store';
 
 /**
  * @function ok
@@ -26,7 +31,7 @@ import { createDemoMenu, DEMO_CREDENTIALS, mockApiStore } from './mock-api.store
  * @param message Mensaje opcional.
  * @returns Envelope de éxito.
  */
-function ok<T>(data: T, message = 'OK'): ApiResponse<T> {
+function ok<T>(data: T, message = 'Respuesta exitosa'): ApiResponse<T> {
   return {
     data,
     success: true,
@@ -144,17 +149,33 @@ function handleMockRequest(
   }
 
   if (method === 'GET' && route === '/menu') {
-    return respond(ok(createDemoMenu()));
+    return respond(ok([...mockApiStore.menus]));
+  }
+
+  const menuById = route.match(/^\/menu\/(\d+)$/);
+  if (method === 'GET' && menuById) {
+    const item = mockApiStore.menus.find((menu) => menu.id === Number(menuById[1]));
+    return item ? respond(ok(item)) : respondError(fail('Menú no encontrado'), 404);
   }
 
   if (method === 'GET' && route === '/servicio/parametros-administracion') {
+    if (mockApiStore.serviceParamsConflict) {
+      return respondError(
+        fail(
+          'Las tarifas base no están configuradas o se encuentran inactivas. Comunícate con el administrador.',
+          '409',
+        ),
+        409,
+      );
+    }
+
     return respond(
       ok({
         telefonos: mockApiStore.telefonos,
         usuariosTecnicos: mockApiStore.users.filter((user) => user.rolId === 2),
         gruas: mockApiStore.vehicles,
         estadosServicio: mockApiStore.statuses,
-        aseguradoras: mockApiStore.insurances,
+        aseguradoras: mockApiStore.insurances.filter((item) => item.activo),
       }),
     );
   }
@@ -192,6 +213,32 @@ function handleMockRequest(
     return handleStatuses(method, statusMatch[1] ? Number(statusMatch[1]) : null, req);
   }
 
+  const typeMatch = route.match(/^\/tipo-vehiculo(?:\/(\d+))?$/);
+  if (typeMatch) {
+    return handleVehicleTypes(method, typeMatch[1] ? Number(typeMatch[1]) : null, req);
+  }
+
+  if (route === '/tarifa-base/parametros-base-tarifaria' && method === 'GET') {
+    return respond(ok({ aseguradoras: mockApiStore.insurances.filter((item) => item.activo) }));
+  }
+
+  const rateMatch = route.match(/^\/tarifa-base(?:\/(\d+))?$/);
+  if (rateMatch && (method === 'POST' || method === 'PUT')) {
+    return handleBaseRates(method, rateMatch[1] ? Number(rateMatch[1]) : null, req);
+  }
+
+  const menuMatch = route.match(/^\/menu(?:\/(\d+))?$/);
+  if (menuMatch && method !== 'GET') {
+    return handleMenus(method, menuMatch[1] ? Number(menuMatch[1]) : null, req);
+  }
+
+  if (method === 'GET' && route === '/menu/parametros-menus') {
+    return respondError(
+      fail('Contrato pendiente: la respuesta de parametros-menus no está documentada.'),
+      404,
+    );
+  }
+
   return respondError(fail(`Ruta demo no implementada: ${method} ${route}`), 404);
 }
 
@@ -207,7 +254,7 @@ function handleLogin(req: HttpRequest<unknown>): Observable<HttpEvent<unknown>> 
   if (body.user === DEMO_CREDENTIALS.user && body.password === DEMO_CREDENTIALS.password) {
     return respond(
       ok({
-        accessToken: 'demo-token-techasis',
+        accessToken: buildDemoAccessToken(3600, { sub: 1, rolId: 1 }),
         tokenType: 'Bearer',
         expiresIn: 3600,
         usuarioId: 1,
@@ -258,12 +305,12 @@ function handleUsers(
       activo: true,
     };
     mockApiStore.users = [...mockApiStore.users, created];
-    return respond(ok(null, 'Usuario creado'));
+    return respond(ok(created, 'Respuesta exitosa'), 201);
   }
 
   if (method === 'PUT' && id !== null) {
     const dto = req.body as SaveUserDTO;
-    mockApiStore.users = mockApiStore.users.map((user) =>
+    const updated = mockApiStore.users.map((user) =>
       user.id === id
         ? {
             ...user,
@@ -277,7 +324,9 @@ function handleUsers(
           }
         : user,
     );
-    return respond(ok(null, 'Usuario actualizado'));
+    mockApiStore.users = updated;
+    const current = updated.find((user) => user.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Usuario no encontrado'), 404);
   }
 
   if (method === 'DELETE' && id !== null) {
@@ -312,28 +361,28 @@ function handleVehicles(
 
   if (method === 'POST') {
     const dto = req.body as SaveVehicleDTO;
-    const tipo =
-      mockApiStore.tiposVehiculo.find((item) => item.id === Number(dto.tipoVehiculoId)) ??
-      mockApiStore.tiposVehiculo[0];
-    mockApiStore.vehicles = [
-      ...mockApiStore.vehicles,
-      {
-        id: mockApiStore.next(),
-        tipoVehiculo: tipo,
-        placa: dto.placa,
-        codigo: dto.codigo,
-        activo: true,
-      },
-    ];
-    return respond(ok(null, 'Vehículo creado'));
+    const tipo = mockApiStore.tiposVehiculo.find((item) => item.id === Number(dto.tipoVehiculoId));
+    if (!tipo) {
+      return respondError(fail('Tipo de vehículo no encontrado'), 400);
+    }
+    const created = {
+      id: mockApiStore.next(),
+      tipoVehiculo: tipo,
+      placa: dto.placa,
+      codigo: dto.codigo,
+      activo: true,
+    };
+    mockApiStore.vehicles = [...mockApiStore.vehicles, created];
+    return respond(ok(created), 201);
   }
 
   if (method === 'PUT' && id !== null) {
     const dto = req.body as SaveVehicleDTO;
-    const tipo =
-      mockApiStore.tiposVehiculo.find((item) => item.id === Number(dto.tipoVehiculoId)) ??
-      mockApiStore.tiposVehiculo[0];
-    mockApiStore.vehicles = mockApiStore.vehicles.map((vehicle) =>
+    const tipo = mockApiStore.tiposVehiculo.find((item) => item.id === Number(dto.tipoVehiculoId));
+    if (!tipo) {
+      return respondError(fail('Tipo de vehículo no encontrado'), 400);
+    }
+    const updated = mockApiStore.vehicles.map((vehicle) =>
       vehicle.id === id
         ? {
             ...vehicle,
@@ -343,7 +392,9 @@ function handleVehicles(
           }
         : vehicle,
     );
-    return respond(ok(null, 'Vehículo actualizado'));
+    mockApiStore.vehicles = updated;
+    const current = updated.find((vehicle) => vehicle.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Vehículo no encontrado'), 404);
   }
 
   if (method === 'DELETE' && id !== null) {
@@ -379,32 +430,32 @@ function handleInsurances(
   }
 
   if (method === 'POST') {
-    const dto = req.body as SaveInsuranceDTO;
-    mockApiStore.insurances = [
-      ...mockApiStore.insurances,
-      {
-        id: mockApiStore.next(),
-        nombre: dto.nombre,
-        codigo: dto.codigo,
-        activo: dto.activo ?? true,
-      },
-    ];
-    return respond(ok(null, 'Aseguradora creada'));
+    const dto = req.body as CreateInsuranceDTO;
+    const created = {
+      id: mockApiStore.next(),
+      nombre: dto.nombre,
+      codigo: dto.codigo,
+      activo: true,
+    };
+    mockApiStore.insurances = [...mockApiStore.insurances, created];
+    return respond(ok(created), 201);
   }
 
   if (method === 'PUT' && id !== null) {
-    const dto = req.body as SaveInsuranceDTO;
-    mockApiStore.insurances = mockApiStore.insurances.map((insurance) =>
+    const dto = req.body as UpdateInsuranceDTO;
+    const updated = mockApiStore.insurances.map((insurance) =>
       insurance.id === id
         ? {
             ...insurance,
             nombre: dto.nombre,
             codigo: dto.codigo,
-            activo: dto.activo ?? insurance.activo,
+            activo: dto.activo,
           }
         : insurance,
     );
-    return respond(ok(null, 'Aseguradora actualizada'));
+    mockApiStore.insurances = updated;
+    const current = updated.find((insurance) => insurance.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Aseguradora no encontrada'), 404);
   }
 
   if (method === 'DELETE' && id !== null) {
@@ -439,21 +490,19 @@ function handleStatuses(
 
   if (method === 'POST') {
     const dto = req.body as SaveServiceStatusDTO;
-    mockApiStore.statuses = [
-      ...mockApiStore.statuses,
-      {
-        id: mockApiStore.next(),
-        descripcion: dto.descripcion,
-        codigo: dto.codigo,
-        activo: dto.activo,
-      },
-    ];
-    return respond(ok(null, 'Estado creado'));
+    const created = {
+      id: mockApiStore.next(),
+      descripcion: dto.descripcion,
+      codigo: dto.codigo,
+      activo: dto.activo,
+    };
+    mockApiStore.statuses = [...mockApiStore.statuses, created];
+    return respond(ok(created), 201);
   }
 
   if (method === 'PUT' && id !== null) {
     const dto = req.body as SaveServiceStatusDTO;
-    mockApiStore.statuses = mockApiStore.statuses.map((status) =>
+    const updated = mockApiStore.statuses.map((status) =>
       status.id === id
         ? {
             ...status,
@@ -463,7 +512,9 @@ function handleStatuses(
           }
         : status,
     );
-    return respond(ok(null, 'Estado actualizado'));
+    mockApiStore.statuses = updated;
+    const current = updated.find((status) => status.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Estado no encontrado'), 404);
   }
 
   if (method === 'DELETE' && id !== null) {
@@ -472,4 +523,144 @@ function handleStatuses(
   }
 
   return respondError(fail(`Operación de estado no soportada: ${method}`), 405);
+}
+
+/**
+ * @function handleVehicleTypes
+ * @description CRUD simulado de tipos de vehículo.
+ * @param method Método HTTP.
+ * @param id Identificador opcional.
+ * @param req Petición original.
+ * @returns Respuesta simulada.
+ */
+function handleVehicleTypes(
+  method: string,
+  id: number | null,
+  req: HttpRequest<unknown>,
+): Observable<HttpEvent<unknown>> {
+  if (method === 'GET' && id === null) {
+    return respond(ok([...mockApiStore.tiposVehiculo]));
+  }
+
+  if (method === 'GET' && id !== null) {
+    const item = mockApiStore.tiposVehiculo.find((type) => type.id === id);
+    return item ? respond(ok(item)) : respondError(fail('Tipo de vehículo no encontrado'), 404);
+  }
+
+  if (method === 'POST') {
+    const dto = req.body as CreateVehicleTypeDTO;
+    const created = {
+      id: mockApiStore.next(),
+      nombre: dto.nombre,
+      codigo: dto.codigo,
+      activo: true,
+      carga: dto.carga,
+    };
+    mockApiStore.tiposVehiculo = [...mockApiStore.tiposVehiculo, created];
+    return respond(ok(created), 201);
+  }
+
+  if (method === 'PUT' && id !== null) {
+    const dto = req.body as UpdateVehicleTypeDTO;
+    const updated = mockApiStore.tiposVehiculo.map((type) =>
+      type.id === id ? { ...type, nombre: dto.nombre, codigo: dto.codigo, activo: dto.activo, carga: dto.carga } : type,
+    );
+    mockApiStore.tiposVehiculo = updated;
+    const current = updated.find((type) => type.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Tipo de vehículo no encontrado'), 404);
+  }
+
+  if (method === 'DELETE' && id !== null) {
+    mockApiStore.tiposVehiculo = mockApiStore.tiposVehiculo.filter((type) => type.id !== id);
+    return respond(ok(null));
+  }
+
+  return respondError(fail(`Operación de tipo de vehículo no soportada: ${method}`), 405);
+}
+
+/**
+ * @function handleBaseRates
+ * @description Crea y actualiza tarifas base. No lista por /api/user.
+ * @param method Método HTTP.
+ * @param id Identificador opcional.
+ * @param req Petición original.
+ * @returns Respuesta simulada.
+ */
+function handleBaseRates(
+  method: string,
+  id: number | null,
+  req: HttpRequest<unknown>,
+): Observable<HttpEvent<unknown>> {
+  if (method === 'POST') {
+    const dto = req.body as SaveBaseRateDTO;
+    const insurer = mockApiStore.insurances.find((item) => item.id === dto.aseguradora.id);
+    if (!insurer) {
+      return respondError(fail('Aseguradora no encontrada'), 400);
+    }
+    const created = {
+      id: mockApiStore.next(),
+      aseguradora: insurer,
+      descripcion: dto.descripcion,
+      valor: dto.valor,
+      codigo: dto.codigo,
+      activo: true,
+    };
+    mockApiStore.baseRates = [...mockApiStore.baseRates, created];
+    return respond(ok(created), 201);
+  }
+
+  if (method === 'PUT' && id !== null) {
+    const dto = req.body as SaveBaseRateDTO;
+    const insurer = mockApiStore.insurances.find((item) => item.id === dto.aseguradora.id);
+    if (!insurer) {
+      return respondError(fail('Aseguradora no encontrada'), 400);
+    }
+    const updated = mockApiStore.baseRates.map((rate) =>
+      rate.id === id
+        ? { ...rate, aseguradora: insurer, descripcion: dto.descripcion, valor: dto.valor, codigo: dto.codigo }
+        : rate,
+    );
+    mockApiStore.baseRates = updated;
+    const current = updated.find((rate) => rate.id === id);
+    return current ? respond(ok(current)) : respondError(fail('Tarifa base no encontrada'), 404);
+  }
+
+  return respondError(
+    fail('Contrato pendiente: esa operación de tarifa base no tiene ruta confirmada.'),
+    404,
+  );
+}
+
+/**
+ * @function handleMenus
+ * @description Crea ítems de menú. Actualizar y eliminar quedan pendientes.
+ * @param method Método HTTP.
+ * @param id Identificador opcional.
+ * @param req Petición original.
+ * @returns Respuesta simulada.
+ */
+function handleMenus(
+  method: string,
+  id: number | null,
+  req: HttpRequest<unknown>,
+): Observable<HttpEvent<unknown>> {
+  if (method === 'POST' && id === null) {
+    const dto = req.body as { menuPadre: { id: number } | null; nombre: string; descripcion: string; codigo: string };
+    const created = {
+      id: mockApiStore.next(),
+      padreMenuId: dto.menuPadre?.id ?? null,
+      menuPadre: dto.menuPadre,
+      nombre: dto.nombre,
+      descripcion: dto.descripcion,
+      codigo: dto.codigo,
+      activo: true,
+    };
+    mockApiStore.menus = [...mockApiStore.menus, created];
+    return respond(ok(created), 201);
+  }
+
+  return respondError(
+    fail('Contrato pendiente: actualizar o eliminar menú no tiene una ruta confirmada.'),
+    404,
+  );
 }

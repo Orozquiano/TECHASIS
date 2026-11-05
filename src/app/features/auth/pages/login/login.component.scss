@@ -218,14 +218,28 @@
   line-height: 1.4;
 }
 
-.login_error {
-  margin-bottom: 18px;
-  padding: 12px 14px;
-  color: var(--danger);
-  background: var(--danger-soft);
-  border: 1px solid var(--danger-border);
-  border-radius: 12px;
-  font-size: 0.9rem;
+.login_alert {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.login_alert-action {
+  width: 100%;
+  min-height: var(--touch);
+  color: var(--brand-on-fill);
+  font: inherit;
+  font-weight: 600;
+  background: var(--brand-fill);
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-secondary);
+    outline-offset: 2px;
+  }
 }
 
 .login_remember {

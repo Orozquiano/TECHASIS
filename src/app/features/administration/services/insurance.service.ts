@@ -3,10 +3,11 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { APP_ENVIRONMENT } from '../../../core/config/app-environment';
 import type {
+  CreateInsuranceDTO,
   InsuranceActionResponse,
   InsuranceListResponse,
   InsuranceSingleResponse,
-  SaveInsuranceDTO,
+  UpdateInsuranceDTO,
 } from '../../../core/models';
 
 /**
@@ -59,12 +60,12 @@ export class InsuranceService {
    * @param insurance Datos de la aseguradora.
    * @returns Resultado de la operación.
    */
-  createInsurance(insurance: SaveInsuranceDTO): Observable<InsuranceActionResponse> {
+  createInsurance(insurance: CreateInsuranceDTO): Observable<InsuranceSingleResponse> {
     return this.http
-      .post<InsuranceActionResponse>(`${this.env.apiUrl}/aseguradora`, insurance)
+      .post<InsuranceSingleResponse>(`${this.env.apiUrl}/aseguradora`, insurance)
       .pipe(
         map((res) => {
-          if (!res.success) {
+          if (!res.success || !res.data) {
             throw res;
           }
           return res;
@@ -79,12 +80,12 @@ export class InsuranceService {
    * @param insurance Datos actualizados.
    * @returns Resultado de la operación.
    */
-  updateInsurance(id: number, insurance: SaveInsuranceDTO): Observable<InsuranceActionResponse> {
+  updateInsurance(id: number, insurance: UpdateInsuranceDTO): Observable<InsuranceSingleResponse> {
     return this.http
-      .put<InsuranceActionResponse>(`${this.env.apiUrl}/aseguradora/${id}`, insurance)
+      .put<InsuranceSingleResponse>(`${this.env.apiUrl}/aseguradora/${id}`, insurance)
       .pipe(
         map((res) => {
-          if (!res.success) {
+          if (!res.success || !res.data) {
             throw res;
           }
           return res;

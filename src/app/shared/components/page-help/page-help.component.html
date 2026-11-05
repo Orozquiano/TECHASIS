@@ -1,0 +1,26 @@
+@if (description(); as text) {
+  <span class="page_help">
+    <button
+      #trigger
+      class="page_help_trigger"
+      type="button"
+      aria-label="Ayuda de la sección"
+      [attr.aria-describedby]="tipId"
+      (pointerenter)="placeTip()"
+      (focus)="placeTip()"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="1.8" />
+        <path
+          d="M12 7.4v5.4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+        <circle cx="12" cy="16.2" r="1" fill="currentColor" />
+      </svg>
+    </button>
+    <span #tip class="page_help_tip" role="tooltip" aria-hidden="true" [id]="tipId">{{ text }}</span>
+  </span>
+}
